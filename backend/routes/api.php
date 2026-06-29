@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
 | Admin Only Routes (Requires Auth + IsAdmin Middleware)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    // Phase 5 will add: POST, PUT, DELETE /products
-    // Phase 6 will add: GET /users
+Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
+    // Phase 5: Product CRUD
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::get('/products', [ProductController::class, 'index']);
+
+    // Phase 6: User Listing
+    Route::get('/users', [UserController::class, 'index']);
 });
