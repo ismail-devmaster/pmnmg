@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\IsAdmin;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,6 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin' => IsAdmin::class,
             'adminOnly' => \App\Http\Middleware\AdminOnly::class,
         ]);
+
+        RedirectIfAuthenticated::redirectUsing(function (Request $request) {
+            if ($request->user()->isAdmin()) {
+                return route('admin.dashboard');
+            }
+
+            return '/';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

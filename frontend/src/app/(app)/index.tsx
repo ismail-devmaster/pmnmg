@@ -1,19 +1,12 @@
-import { Platform, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { Platform, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
-import {
-  ThemedView,
-  ThemedText,
-  ThemedButton,
-  ProductCard,
-} from '@/components';
+import { useCallback, useState } from 'react';
+import { ThemedButton, ThemedInput, ProductCard } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useProducts } from '@/hooks/useProducts';
-import { Product } from '@/types';
+import { useTheme } from '@/hooks/use-theme';
 import {
-  Elevation,
   MaxContentWidth,
-  PremiumPalette,
   Radius,
   Spacing,
 } from '@/constants/theme';
@@ -22,6 +15,9 @@ export default function ProductListScreen() {
   const { user, logout } = useAuth();
   const { products, loading, refreshing, error, onRefresh, fetchProducts } =
     useProducts();
+  const theme = useTheme();
+
+  const [search, setSearch] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -29,54 +25,39 @@ export default function ProductListScreen() {
     }, [fetchProducts])
   );
 
-  const renderProduct = ({ item }: { item: Product }) => (
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const renderProduct = ({ item }: { item: typeof products[0] }) => (
     <ProductCard product={item} />
   );
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <View style={styles.emptyIconCircle}>
-        <ThemedText type="display" style={styles.emptyIconText}>
-          +
-        </ThemedText>
+      <View style={[styles.emptyIconCircle, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+        <Text style={styles.emptyIconText}>📦</Text>
       </View>
-      <ThemedText type="titleSmall" style={styles.emptyTitle}>
-        No products yet
-      </ThemedText>
-      <ThemedText
-        type="body"
-        themeColor="textSecondary"
-        style={styles.emptySubtitle}
-      >
-        Products will appear here once they are added.
-      </ThemedText>
+      <Text style={[styles.emptyTitle, { color: theme.text }]}>
+        No products found.
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+        {search ? 'Try a different search term.' : 'Products will appear here once they are added.'}
+      </Text>
     </View>
   );
 
   const renderError = () => (
     <View style={styles.emptyContainer}>
-      <View style={[styles.emptyIconCircle, styles.errorIconCircle]}>
-        <ThemedText
-          type="display"
-          style={[styles.emptyIconText, styles.errorIconText]}
-        >
-          !
-        </ThemedText>
+      <View style={[styles.emptyIconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.25)' }]}>
+        <Text style={[styles.emptyIconText, { color: '#ef4444' }]}>!</Text>
       </View>
-      <ThemedText
-        type="titleSmall"
-        themeColor="error"
-        style={styles.emptyTitle}
-      >
+      <Text style={[styles.emptyTitle, { color: '#ef4444' }]}>
         Something went wrong
-      </ThemedText>
-      <ThemedText
-        type="body"
-        themeColor="textSecondary"
-        style={styles.emptySubtitle}
-      >
+      </Text>
+      <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
         {error || 'Failed to load products'}
-      </ThemedText>
+      </Text>
       <ThemedButton
         title="Try Again"
         onPress={() => fetchProducts()}
@@ -90,40 +71,31 @@ export default function ProductListScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ThemedView
-          type="card"
-          style={[styles.loadingCard, Elevation.medium]}
-        >
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <View style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
           <View style={styles.loadingDotRow}>
             <View style={[styles.loadingDot, styles.loadingDot1]} />
             <View style={[styles.loadingDot, styles.loadingDot2]} />
             <View style={[styles.loadingDot, styles.loadingDot3]} />
           </View>
-          <ThemedText
-            type="body"
-            themeColor="textSecondary"
-            style={styles.loadingText}
-          >
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
             Loading products...
-          </ThemedText>
-        </ThemedView>
+          </Text>
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Premium Header */}
-      <View style={[styles.header, Elevation.low]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: theme.background }]}>
         <View style={styles.headerContent}>
           <View>
-            <ThemedText type="overline" style={styles.headerGreeting}>
+            <Text style={[styles.headerGreeting, { color: '#818cf8' }]}>
               {getGreeting()} {user?.name?.split(' ')[0] ?? ''}
-            </ThemedText>
-            <ThemedText type="headline" style={styles.headerTitle}>
-              Products
-            </ThemedText>
+            </Text>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>Products</Text>
           </View>
           <ThemedButton
             title="Sign Out"
@@ -131,30 +103,36 @@ export default function ProductListScreen() {
             variant="ghost"
             size="small"
             fullWidth={false}
-            style={styles.signOutButton}
           />
         </View>
       </View>
 
-      {/* Product Count Bar */}
+      {/* Product Count */}
       <View style={styles.countBar}>
-        <ThemedText
-          type="labelSmall"
-          themeColor="textTertiary"
-          style={styles.countText}
-        >
+        <Text style={[styles.countText, { color: theme.textTertiary }]}>
           {products.length} {products.length === 1 ? 'PRODUCT' : 'PRODUCTS'}
-        </ThemedText>
+        </Text>
       </View>
 
-      {/* Product List */}
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <ThemedInput
+          placeholder="Search products..."
+          value={search}
+          onChangeText={setSearch}
+          leftIcon={<Text style={styles.searchIcon}>🔍</Text>}
+          containerStyle={styles.searchInput}
+        />
+      </View>
+
+      {/* Product List — read-only, no edit/delete */}
       <FlatList
-        data={products}
+        data={filteredProducts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderProduct}
         contentContainerStyle={[
           styles.listContainer,
-          products.length === 0 && styles.emptyList,
+          filteredProducts.length === 0 && styles.emptyList,
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={error ? renderError : renderEmpty}
@@ -162,8 +140,8 @@ export default function ProductListScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={PremiumPalette.champagneGold}
-            colors={[PremiumPalette.champagneGold]}
+            tintColor="#6366f1"
+            colors={['#6366f1']}
           />
         }
       />
@@ -181,7 +159,6 @@ function getGreeting(): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: PremiumPalette.pearl,
   },
 
   /* ── Header ─────────────────────────────────────────── */
@@ -189,9 +166,8 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 60 : 48,
     paddingBottom: Spacing.five,
     paddingHorizontal: Spacing.six,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-    backgroundColor: PremiumPalette.navy,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(99, 102, 241, 0.12)',
   },
   headerContent: {
     flexDirection: 'row',
@@ -199,27 +175,41 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   headerGreeting: {
+    fontSize: 11,
+    fontWeight: '700',
     letterSpacing: 1.5,
+    textTransform: 'uppercase',
     marginBottom: Spacing.one,
-    color: PremiumPalette.champagneGold,
   },
   headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
     letterSpacing: -0.3,
-    color: '#FFFFFF',
-  },
-  signOutButton: {
-    opacity: 0.85,
   },
 
   /* ── Count Bar ──────────────────────────────────────── */
   countBar: {
     paddingHorizontal: Spacing.six,
     paddingTop: Spacing.four,
-    paddingBottom: Spacing.two,
+    paddingBottom: Spacing.one,
   },
   countText: {
+    fontSize: 11,
+    fontWeight: '700',
     letterSpacing: 2.5,
-    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+
+  /* ── Search ─────────────────────────────────────────── */
+  searchContainer: {
+    paddingHorizontal: Spacing.six,
+    paddingBottom: Spacing.two,
+  },
+  searchInput: {
+    marginBottom: 0,
+  },
+  searchIcon: {
+    fontSize: 14,
   },
 
   /* ── List ───────────────────────────────────────────── */
@@ -244,36 +234,27 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: Radius.full,
-    backgroundColor: '#F0EDE6',
     borderWidth: 1.5,
-    borderColor: PremiumPalette.champagneGoldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.six,
   },
   emptyIconText: {
-    color: PremiumPalette.champagneGold,
-    fontSize: 36,
-    fontWeight: '300',
+    fontSize: 32,
   },
   emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: Spacing.two,
-    color: PremiumPalette.obsidian,
   },
   emptySubtitle: {
+    fontSize: 14,
     textAlign: 'center',
     maxWidth: 280,
+    lineHeight: 20,
   },
 
   /* ── Error State ────────────────────────────────────── */
-  errorIconCircle: {
-    backgroundColor: PremiumPalette.warmRedLight,
-    borderColor: PremiumPalette.warmRed,
-  },
-  errorIconText: {
-    color: PremiumPalette.warmRed,
-    fontWeight: '700',
-  },
   retryButton: {
     marginTop: Spacing.five,
     paddingHorizontal: Spacing.six,
@@ -284,12 +265,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: PremiumPalette.pearl,
   },
   loadingCard: {
     paddingHorizontal: Spacing.eight,
     paddingVertical: Spacing.six,
     borderRadius: Radius.xl,
+    borderWidth: 1,
     alignItems: 'center',
   },
   loadingDotRow: {
@@ -301,13 +282,14 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: Radius.full,
-    backgroundColor: PremiumPalette.champagneGold,
+    backgroundColor: '#6366f1',
     opacity: 0.3,
   },
   loadingDot1: { opacity: 1 },
   loadingDot2: { opacity: 0.6 },
   loadingDot3: { opacity: 0.3 },
   loadingText: {
+    fontSize: 14,
     letterSpacing: 0.5,
   },
 });

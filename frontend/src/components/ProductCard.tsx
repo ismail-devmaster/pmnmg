@@ -1,13 +1,9 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Product } from '@/types';
-import { ThemedView } from './themed-view';
-import { ThemedText } from './themed-text';
+import { useTheme } from '@/hooks/use-theme';
 import {
-  Elevation,
   Radius,
   Spacing,
-  PremiumPalette,
-  Colors,
 } from '@/constants/theme';
 
 interface ProductCardProps {
@@ -20,61 +16,51 @@ function formatPrice(price: number): string {
 }
 
 export function ProductCard({ product, onPress }: ProductCardProps) {
+  const theme = useTheme();
+
   return (
     <Pressable
       onPress={onPress}
       disabled={!onPress}
       style={({ pressed }) => [
         styles.wrapper,
-        Elevation.high,
+        {
+          backgroundColor: theme.card,
+          borderColor: theme.cardBorder,
+        },
         pressed && onPress && styles.pressed,
       ]}
     >
-      <ThemedView type="card" style={styles.card}>
-        <View style={styles.accentStripe} />
-
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <View style={styles.titleContainer}>
-              <ThemedText
-                type="titleSmall"
-                style={styles.name}
-                numberOfLines={1}
-              >
-                {product.name}
-              </ThemedText>
+      <View style={styles.content}>
+        {/* Product Icon + Name */}
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <View style={[styles.iconContainer, { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderColor: 'rgba(99, 102, 241, 0.2)' }]}>
+              <Text style={styles.iconText}>📦</Text>
             </View>
-            <View style={styles.priceBadge}>
-              <ThemedText
-                type="bodyStrong"
-                style={styles.priceText}
-              >
-                {formatPrice(product.price)}
-              </ThemedText>
-            </View>
+            <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
+              {product.name}
+            </Text>
           </View>
-
-          {product.description ? (
-            <ThemedText
-              type="body"
-              themeColor="textSecondary"
-              style={styles.description}
-              numberOfLines={2}
-            >
-              {product.description}
-            </ThemedText>
-          ) : null}
-
-          <View style={styles.footer}>
-            <ThemedText
-              type="caption"
-              style={styles.id}
-            >
-              #{String(product.id).padStart(4, '0')}
-            </ThemedText>
-          </View>
+          <Text style={[styles.price, { color: '#818cf8' }]}>
+            {formatPrice(product.price)}
+          </Text>
         </View>
-      </ThemedView>
+
+        {/* Description */}
+        {product.description ? (
+          <Text style={[styles.description, { color: theme.textSecondary }]} numberOfLines={2}>
+            {product.description}
+          </Text>
+        ) : null}
+
+        {/* Footer — product ID only */}
+        <View style={[styles.footer, { borderTopColor: theme.border }]}>
+          <Text style={[styles.id, { color: theme.textTertiary }]}>
+            #{String(product.id).padStart(4, '0')}
+          </Text>
+        </View>
+      </View>
     </Pressable>
   );
 }
@@ -82,18 +68,12 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
 const styles = StyleSheet.create({
   wrapper: {
     borderRadius: Radius.xl,
-    marginBottom: Spacing.four,
-    backgroundColor: 'transparent',
-  },
-  card: {
-    borderRadius: Radius.xl,
-    overflow: 'hidden',
+    marginBottom: Spacing.three,
     borderWidth: 1,
-    borderColor: Colors.light.cardBorder,
   },
-  accentStripe: {
-    height: 3,
-    backgroundColor: PremiumPalette.champagneGold,
+  pressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
   },
   content: {
     padding: Spacing.five,
@@ -101,47 +81,54 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: Spacing.three,
+    alignItems: 'center',
+    marginBottom: Spacing.two,
   },
   titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
-    marginRight: Spacing.four,
+    gap: Spacing.three,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.xl,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 18,
   },
   name: {
-    letterSpacing: -0.3,
+    fontSize: 16,
     fontWeight: '600',
+    letterSpacing: -0.3,
+    flex: 1,
   },
-  priceBadge: {
-    backgroundColor: PremiumPalette.champagneGold,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.one,
-    borderRadius: Radius.sm,
-  },
-  priceText: {
-    color: Colors.light.onSecondary,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+  price: {
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   description: {
-    lineHeight: 24,
-    marginBottom: Spacing.four,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: Spacing.three,
+    marginLeft: 56,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: Colors.light.borderLight,
+    borderTopColor: 'rgba(99, 102, 241, 0.12)',
     paddingTop: Spacing.three,
   },
   id: {
-    color: PremiumPalette.champagneGold,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 1,
-  },
-  pressed: {
-    opacity: 0.88,
-    transform: [{ scale: 0.98 }],
   },
 });

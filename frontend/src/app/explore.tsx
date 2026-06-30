@@ -1,22 +1,17 @@
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
+import { useTheme } from '@/hooks/use-theme';
 import {
   BottomTabInset,
   MaxContentWidth,
-  PremiumPalette,
-  Elevation,
   Radius,
   Spacing,
 } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 
 export default function TabTwoScreen() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -41,37 +36,33 @@ export default function TabTwoScreen() {
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: PremiumPalette.obsidian }]}
+      style={[styles.scrollView, { backgroundColor: theme.background }]}
       contentInset={insets}
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}
     >
-      <ThemedView style={styles.container}>
+      <View style={styles.container}>
         {/* Hero header */}
         <View style={styles.heroHeader}>
-          <View style={styles.heroDot} />
-          <ThemedText type="overline" themeColor="secondary" style={styles.heroOverline}>
-            Explore
-          </ThemedText>
-          <ThemedText type="headline" style={styles.heroTitle}>
+          <View style={[styles.heroDot, { backgroundColor: '#6366f1' }]} />
+          <Text style={[styles.heroOverline, { color: '#818cf8' }]}>
+            EXPLORE
+          </Text>
+          <Text style={[styles.heroTitle, { color: theme.text }]}>
             Build with Expo
-          </ThemedText>
-          <ThemedText
-            type="body"
-            themeColor="textSecondary"
-            style={styles.heroDescription}
-          >
+          </Text>
+          <Text style={[styles.heroDescription, { color: theme.textSecondary }]}>
             This starter app includes example code to help you get started
             building cross-platform apps.
-          </ThemedText>
+          </Text>
 
           <ExternalLink href="https://docs.expo.dev" asChild>
             <Pressable style={({ pressed }) => pressed && styles.pressed}>
               <View style={styles.linkButton}>
-                <ThemedText type="label" style={styles.linkButtonText}>
+                <Text style={styles.linkButtonText}>
                   Expo Documentation
-                </ThemedText>
+                </Text>
                 <SymbolView
-                  tintColor={PremiumPalette.obsidian}
+                  tintColor="#0a0a1a"
                   name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
                   size={12}
                 />
@@ -83,74 +74,80 @@ export default function TabTwoScreen() {
         {/* Sections */}
         <View style={styles.sectionsWrapper}>
           <Collapsible title="File-based routing">
-            <ThemedText type="caption">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText>{' '}
-              and <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="caption" style={styles.collapsibleGap}>
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
+            <Text style={[styles.collapsibleText, { color: theme.textSecondary }]}>
+              This app has two screens: <Text style={styles.code}>src/app/index.tsx</Text>{' '}
+              and <Text style={styles.code}>src/app/explore.tsx</Text>
+            </Text>
+            <Text style={[styles.collapsibleText, { color: theme.textSecondary, marginTop: Spacing.two }]}>
+              The layout file in <Text style={styles.code}>src/app/_layout.tsx</Text> sets up
               the tab navigator.
-            </ThemedText>
+            </Text>
             <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="label" themeColor="secondary">
+              <Text style={[styles.learnMore, { color: '#818cf8' }]}>
                 Learn more
-              </ThemedText>
+              </Text>
             </ExternalLink>
           </Collapsible>
 
           <Collapsible title="Cross-platform support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="caption">
+            <View style={[styles.collapsibleContent, { backgroundColor: '#12122b', borderColor: 'rgba(99, 102, 241, 0.12)' }]}>
+              <Text style={[styles.collapsibleText, { color: theme.textSecondary }]}>
                 You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="bodyStrong">w</ThemedText> in the terminal running this
+                press <Text style={styles.codeBold}>w</Text> in the terminal running this
                 project.
-              </ThemedText>
+              </Text>
               <Image
                 source={require('@/assets/images/tutorial-web.png')}
                 style={styles.imageTutorial}
               />
-            </ThemedView>
+            </View>
           </Collapsible>
 
           <Collapsible title="Image assets">
-            <ThemedText type="caption">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
+            <Text style={[styles.collapsibleText, { color: theme.textSecondary }]}>
+              For static images, you can use the <Text style={styles.code}>@2x</Text> and{' '}
+              <Text style={styles.code}>@3x</Text> suffixes to provide files for different
               screen densities.
-            </ThemedText>
+            </Text>
             <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
             <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="label" themeColor="secondary">
+              <Text style={[styles.learnMore, { color: '#818cf8' }]}>
                 Learn more
-              </ThemedText>
+              </Text>
             </ExternalLink>
           </Collapsible>
 
           <Collapsible title="Theming">
-            <ThemedText type="caption">
+            <Text style={[styles.collapsibleText, { color: theme.textSecondary }]}>
               This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect the
+              <Text style={styles.code}>useColorScheme()</Text> hook lets you inspect the
               user&apos;s current color scheme, and adjust UI colors accordingly.
-            </ThemedText>
+            </Text>
             <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="label" themeColor="secondary">
+              <Text style={[styles.learnMore, { color: '#818cf8' }]}>
                 Learn more
-              </ThemedText>
+              </Text>
             </ExternalLink>
           </Collapsible>
 
           <Collapsible title="Animations">
-            <ThemedText type="caption">
+            <Text style={[styles.collapsibleText, { color: theme.textSecondary }]}>
               This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the <ThemedText type="code">react-native-reanimated</ThemedText> library to
+              <Text style={styles.code}>src/components/ui/collapsible.tsx</Text> component uses
+              the <Text style={styles.code}>react-native-reanimated</Text> library to
               animate opening this hint.
-            </ThemedText>
+            </Text>
           </Collapsible>
         </View>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
+        {Platform.OS === 'web' && (
+          <View style={styles.webBadge}>
+            <Text style={[styles.webBadgeText, { color: theme.textTertiary }]}>
+              Expo SDK 52
+            </Text>
+          </View>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -166,7 +163,6 @@ const styles = StyleSheet.create({
   container: {
     maxWidth: MaxContentWidth,
     flexGrow: 1,
-    backgroundColor: PremiumPalette.obsidian,
   },
   heroHeader: {
     alignItems: 'center',
@@ -174,29 +170,30 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.twenty,
     paddingBottom: Spacing.twelve,
     gap: Spacing.three,
-    backgroundColor: PremiumPalette.obsidian,
   },
   heroDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: PremiumPalette.champagneGold,
     marginBottom: Spacing.two,
   },
   heroOverline: {
+    fontSize: 11,
+    fontWeight: '700',
     letterSpacing: 2,
-    color: PremiumPalette.champagneGold,
+    textTransform: 'uppercase',
   },
   heroTitle: {
+    fontSize: 28,
+    fontWeight: '700',
     textAlign: 'center',
     letterSpacing: -0.5,
-    color: PremiumPalette.pearl,
   },
   heroDescription: {
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'center',
     maxWidth: 360,
-    lineHeight: 24,
-    color: PremiumPalette.pearlMuted,
   },
   pressed: {
     opacity: 0.7,
@@ -206,14 +203,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.six,
     paddingVertical: Spacing.four,
     borderRadius: Radius.lg,
-    backgroundColor: PremiumPalette.champagneGold,
+    backgroundColor: '#6366f1',
     justifyContent: 'center',
     gap: Spacing.two,
     alignItems: 'center',
     marginTop: Spacing.two,
   },
   linkButtonText: {
-    color: PremiumPalette.obsidian,
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   sectionsWrapper: {
@@ -222,15 +219,39 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.four,
     paddingBottom: Spacing.sixteen,
   },
+  collapsibleText: {
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  code: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    color: '#818cf8',
+  },
+  codeBold: {
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    fontWeight: '700',
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    color: '#818cf8',
+  },
+  learnMore: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: Spacing.two,
+  },
   collapsibleContent: {
     alignItems: 'center',
     borderRadius: Radius.lg,
-    backgroundColor: PremiumPalette.obsidianLight,
     borderWidth: 1,
-    borderColor: '#1E1F26',
-  },
-  collapsibleGap: {
-    marginTop: Spacing.two,
+    padding: Spacing.four,
   },
   imageTutorial: {
     width: '100%',
@@ -243,5 +264,12 @@ const styles = StyleSheet.create({
     height: 100,
     alignSelf: 'center',
     marginTop: Spacing.three,
+  },
+  webBadge: {
+    alignItems: 'center',
+    paddingVertical: Spacing.six,
+  },
+  webBadgeText: {
+    fontSize: 12,
   },
 });

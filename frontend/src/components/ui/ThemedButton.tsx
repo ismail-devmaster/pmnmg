@@ -25,80 +25,80 @@ export interface ThemedButtonProps extends Omit<TouchableOpacityProps, 'style' |
 
 const VARIANT_CONFIG = {
   primary: {
-    light: { bg: '#1B2A4A', text: '#FFFFFF', border: '#1B2A4A' },
-    dark: { bg: '#2A4070', text: '#F5F0E8', border: '#2A4070' },
+    light: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
+    dark: { bg: '#4f46e5', text: '#FFFFFF', border: '#4f46e5' },
   },
   secondary: {
-    light: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
-    dark: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
+    light: { bg: '#818cf8', text: '#FFFFFF', border: '#818cf8' },
+    dark: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
   },
   accent: {
-    light: { bg: '#D97706', text: '#FFFFFF', border: '#D97706' },
-    dark: { bg: '#FBBF24', text: PremiumPalette.obsidian, border: '#FBBF24' },
+    light: { bg: '#fbbf24', text: '#0a0a1a', border: '#fbbf24' },
+    dark: { bg: '#f59e0b', text: '#0a0a1a', border: '#f59e0b' },
   },
   danger: {
-    light: { bg: '#DC2626', text: '#FFFFFF', border: '#DC2626' },
-    dark: { bg: '#F87171', text: PremiumPalette.obsidian, border: '#F87171' },
+    light: { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.25)' },
+    dark: { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.25)' },
   },
   ghost: {
-    light: { bg: 'transparent', text: PremiumPalette.champagneGold, border: 'transparent' },
-    dark: { bg: 'transparent', text: PremiumPalette.champagneGold, border: 'transparent' },
+    light: { bg: 'transparent', text: '#a8a8c0', border: 'transparent' },
+    dark: { bg: 'transparent', text: '#a8a8c0', border: 'transparent' },
   },
   outline: {
-    light: { bg: 'transparent', text: PremiumPalette.champagneGold, border: PremiumPalette.champagneGold },
-    dark: { bg: 'transparent', text: PremiumPalette.champagneGold, border: PremiumPalette.champagneGold },
+    light: { bg: 'transparent', text: '#818cf8', border: 'rgba(99, 102, 241, 0.3)' },
+    dark: { bg: 'transparent', text: '#818cf8', border: 'rgba(99, 102, 241, 0.3)' },
   },
   premium: {
-    light: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
-    dark: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
+    light: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
+    dark: { bg: '#4f46e5', text: '#FFFFFF', border: '#4f46e5' },
   },
 } as const;
 
 const VARIANT_SHADOW = {
   primary: {
     light: {
-      shadowColor: '#1B2A4A',
+      shadowColor: '#6366f1',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.25,
+      shadowOpacity: 0.3,
       shadowRadius: 8,
       elevation: 4,
     },
     dark: {
-      shadowColor: '#2A4070',
+      shadowColor: '#4f46e5',
       shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.35,
       shadowRadius: 8,
       elevation: 4,
     },
   },
   secondary: {
     light: {
-      shadowColor: PremiumPalette.warmShadow,
+      shadowColor: '#818cf8',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
+      shadowOpacity: 0.2,
       shadowRadius: 6,
       elevation: 3,
     },
     dark: {
-      shadowColor: PremiumPalette.champagneGoldDark,
+      shadowColor: '#6366f1',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
+      shadowOpacity: 0.25,
       shadowRadius: 6,
       elevation: 3,
     },
   },
   premium: {
     light: {
-      shadowColor: PremiumPalette.warmShadow,
+      shadowColor: '#6366f1',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
+      shadowOpacity: 0.3,
       shadowRadius: 10,
       elevation: 5,
     },
     dark: {
-      shadowColor: PremiumPalette.champagneGoldDark,
+      shadowColor: '#4f46e5',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.25,
+      shadowOpacity: 0.35,
       shadowRadius: 10,
       elevation: 5,
     },
@@ -142,7 +142,7 @@ export function ThemedButton({
   ...props
 }: ThemedButtonProps) {
   const theme = useTheme();
-  const isDark = theme.text === '#F3F4F6';
+  const isDark = theme.text === '#f0f0f5';
   const isDisabled = disabled || loading;
 
   const colors = VARIANT_CONFIG[variant][isDark ? 'dark' : 'light'];

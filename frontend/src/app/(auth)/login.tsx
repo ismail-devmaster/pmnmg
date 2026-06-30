@@ -4,18 +4,17 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import { Link } from 'expo-router';
-import { ThemedText, ThemedInput, ThemedButton } from '@/components';
+import { ThemedInput, ThemedButton } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/use-theme';
 import {
   PremiumPalette,
-  Colors,
-  Elevation,
   Radius,
   Spacing,
-  Typography,
 } from '@/constants/theme';
 
 export default function LoginScreen() {
@@ -24,6 +23,7 @@ export default function LoginScreen() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { login, loading } = useAuth();
+  const theme = useTheme();
 
   const validateForm = (): boolean => {
     let valid = true;
@@ -56,119 +56,88 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Premium Hero Section */}
-      <View style={styles.heroSection}>
-        <View style={styles.heroGradient} />
-        <View style={styles.geometricOverlay}>
-          <View style={styles.geoLine1} />
-          <View style={styles.geoLine2} />
-          <View style={styles.geoLine3} />
-          <View style={styles.geoDot1} />
-          <View style={styles.geoDot2} />
-          <View style={styles.geoDot3} />
-        </View>
-        <View style={styles.heroContent}>
-          <View style={styles.brandMark}>
-            <ThemedText type="displayHero" style={styles.brandLetter}>
-              P
-            </ThemedText>
-          </View>
-          <View style={styles.titleGroup}>
-            <ThemedText type="display" style={styles.heroTitleLight}>
-              Product
-            </ThemedText>
-            <ThemedText type="display" style={styles.heroTitleGold}>
-              Manager
-            </ThemedText>
-          </View>
-          <ThemedText type="caption" style={styles.heroTagline}>
-            Premium Client Management
-          </ThemedText>
-        </View>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      {/* Background noise texture overlay */}
+      <View style={styles.noiseOverlay} />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoiding}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {/* Glass Form Card */}
-          <View style={styles.formCardWrapper}>
-            <View style={[styles.formCard, Elevation.elevated]}>
-              <View style={styles.formHeader}>
-                <ThemedText type="headline" style={styles.formTitle}>
-                  Welcome back
-                </ThemedText>
-                <ThemedText
-                  type="body"
-                  style={styles.formSubtitle}
-                >
-                  Sign in to your client account
-                </ThemedText>
-              </View>
+          {/* Mobile Brand Header */}
+          <View style={styles.mobileBrand}>
+            <View style={styles.brandIconContainer}>
+              <Text style={styles.brandIconText}>🛡️</Text>
+            </View>
+            <Text style={[styles.brandName, { color: theme.text }]}>
+              Product Manager
+            </Text>
+          </View>
 
-              <View style={styles.formBody}>
-                <ThemedInput
-                  label="Email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    if (emailError) setEmailError('');
-                  }}
-                  error={emailError}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  textContentType="emailAddress"
-                  autoComplete="email"
-                />
+          {/* Welcome Header */}
+          <View style={styles.welcomeHeader}>
+            <Text style={[styles.welcomeTitle, { color: theme.text }]}>
+              Welcome back
+            </Text>
+            <Text style={[styles.welcomeSubtitle, { color: theme.textSecondary }]}>
+              Sign in to your client account
+            </Text>
+          </View>
 
-                <ThemedInput
-                  label="Password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    if (passwordError) setPasswordError('');
-                  }}
-                  error={passwordError}
-                  secureTextEntry
-                  textContentType="password"
-                  autoComplete="current-password"
-                />
+          {/* Login Form Card */}
+          <View style={[styles.formCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+            <View style={styles.formBody}>
+              <ThemedInput
+                label="Email Address"
+                placeholder="client@app.com"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (emailError) setEmailError('');
+                }}
+                error={emailError}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                autoComplete="email"
+              />
 
-                <ThemedButton
-                  title="Sign In"
-                  onPress={handleLogin}
-                  loading={loading}
-                  variant="primary"
-                  size="large"
-                  fullWidth
-                  style={styles.submitButton}
-                />
-              </View>
+              <ThemedInput
+                label="Password"
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (passwordError) setPasswordError('');
+                }}
+                error={passwordError}
+                secureTextEntry
+                textContentType="password"
+                autoComplete="current-password"
+              />
+
+              <ThemedButton
+                title="Sign In"
+                onPress={handleLogin}
+                loading={loading}
+                variant="primary"
+                size="large"
+                fullWidth
+                style={styles.submitButton}
+              />
             </View>
           </View>
 
           {/* Footer */}
           <View style={styles.footer}>
-            <ThemedText type="body" style={styles.footerText}>
-              Don&apos;t have an account?{' '}
-            </ThemedText>
-            <Link href="/(auth)/register" asChild>
-              <ThemedButton
-                title="Get Started"
-                onPress={() => {}}
-                variant="ghost"
-                size="small"
-                fullWidth={false}
-              />
-            </Link>
+            <Text style={[styles.footerText, { color: theme.textTertiary }]}>
+              Client portal — For authorized users only
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -179,133 +148,15 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
-  heroSection: {
-    position: 'relative',
-    paddingTop: Platform.OS === 'ios' ? 96 : 72,
-    paddingBottom: Spacing.ten,
-    paddingHorizontal: Spacing.six,
-    overflow: 'hidden',
-  },
-  heroGradient: {
+  noiseOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: PremiumPalette.navy,
-  },
-  geometricOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    overflow: 'hidden',
-  },
-  geoLine1: {
-    position: 'absolute',
-    top: 20,
-    right: -40,
-    width: 200,
-    height: 1,
-    backgroundColor: 'rgba(201, 169, 97, 0.12)',
-    transform: [{ rotate: '-30deg' }],
-  },
-  geoLine2: {
-    position: 'absolute',
-    top: 60,
-    right: -20,
-    width: 160,
-    height: 1,
-    backgroundColor: 'rgba(201, 169, 97, 0.08)',
-    transform: [{ rotate: '-30deg' }],
-  },
-  geoLine3: {
-    position: 'absolute',
-    bottom: 30,
-    left: -30,
-    width: 180,
-    height: 1,
-    backgroundColor: 'rgba(201, 169, 97, 0.1)',
-    transform: [{ rotate: '30deg' }],
-  },
-  geoDot1: {
-    position: 'absolute',
-    top: 40,
-    left: 30,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(201, 169, 97, 0.15)',
-  },
-  geoDot2: {
-    position: 'absolute',
-    top: 80,
-    right: 50,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(201, 169, 97, 0.1)',
-  },
-  geoDot3: {
-    position: 'absolute',
-    bottom: 50,
-    right: 80,
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: 'rgba(201, 169, 97, 0.12)',
-  },
-  heroContent: {
-    alignItems: 'center',
-    position: 'relative',
-    zIndex: 2,
-  },
-  brandMark: {
-    width: 80,
-    height: 80,
-    borderRadius: Radius.xl,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: PremiumPalette.champagneGold,
-    shadowColor: PremiumPalette.champagneGold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 12,
-    marginBottom: Spacing.five,
-  },
-  brandLetter: {
-    color: PremiumPalette.champagneGold,
-  },
-  titleGroup: {
-    alignItems: 'center',
-  },
-  heroTitleLight: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontSize: 32,
-    fontWeight: '300',
-    letterSpacing: -0.5,
-  },
-  heroTitleGold: {
-    color: PremiumPalette.champagneGold,
-    textAlign: 'center',
-    fontSize: 32,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-    marginTop: -2,
-  },
-  heroTagline: {
-    color: 'rgba(255, 255, 255, 0.45)',
-    textAlign: 'center',
-    marginTop: Spacing.three,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    opacity: 0.03,
+    backgroundColor: 'transparent',
   },
   keyboardAvoiding: {
     flex: 1,
@@ -313,45 +164,66 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: Spacing.six,
-    paddingTop: Spacing.four,
+    paddingTop: Platform.OS === 'ios' ? 80 : 60,
     paddingBottom: Spacing.twenty,
   },
-  formCardWrapper: {
-    marginTop: Spacing.three,
+  mobileBrand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.ten,
+    gap: Spacing.three,
   },
-  formCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+  brandIconContainer: {
+    width: 48,
+    height: 48,
     borderRadius: Radius.xl,
-    borderWidth: 1,
-    borderColor: 'rgba(232, 228, 220, 0.6)',
-    overflow: 'hidden',
+    backgroundColor: '#6366f1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  formHeader: {
-    paddingHorizontal: Spacing.six,
-    paddingTop: Spacing.six,
-    paddingBottom: Spacing.four,
+  brandIconText: {
+    fontSize: 24,
   },
-  formTitle: {
+  brandName: {
+    fontSize: 24,
+    fontWeight: '700',
     letterSpacing: -0.3,
   },
-  formSubtitle: {
-    marginTop: Spacing.one,
-    color: Colors.light.textSecondary,
+  welcomeHeader: {
+    marginBottom: Spacing.eight,
+  },
+  welcomeTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    marginBottom: Spacing.two,
+  },
+  welcomeSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  formCard: {
+    borderRadius: Radius.xl,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
   formBody: {
-    paddingHorizontal: Spacing.six,
-    paddingBottom: Spacing.six,
+    padding: Spacing.six,
   },
   submitButton: {
     marginTop: Spacing.three,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: Spacing.six,
+    marginTop: Spacing.eight,
   },
   footerText: {
-    color: Colors.light.textSecondary,
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 });

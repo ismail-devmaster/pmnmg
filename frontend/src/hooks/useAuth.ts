@@ -25,6 +25,14 @@ export function useAuth(): UseAuthReturn {
         storage.getToken(),
         storage.getUser(),
       ]);
+
+      // If stored user is admin, purge everything — admin must not use this app
+      if (storedUser?.role === 'admin') {
+        await storage.clearAuth();
+        setUser(null);
+        return;
+      }
+
       setUser(storedUser);
     } catch (error) {
       if (__DEV__) console.error('Auth check failed:', error);
@@ -39,9 +47,11 @@ export function useAuth(): UseAuthReturn {
       const { token, user: userData } = response.data;
 
       if (userData.role === 'admin') {
+        // Purge any token that may have been returned — admin must NOT use this app
+        await storage.clearAuth();
         Alert.alert(
           'Access Denied',
-          'Admin access is restricted to the web application only. Please use the web portal to manage products and users.'
+          'This application is for client use only. Admins must use the web portal.'
         );
         return false;
       }

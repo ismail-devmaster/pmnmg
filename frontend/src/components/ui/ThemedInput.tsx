@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View, ViewProps } from 'react-native';
 import { useTheme } from '@/hooks/use-theme';
-import { Elevation, PremiumPalette, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 
 export interface ThemedInputProps extends Omit<TextInputProps, 'style'> {
   label?: string;
@@ -19,82 +19,88 @@ export function ThemedInput({
   containerStyle,
   inputStyle,
   leftIcon,
-  ...props
+  onFocus: onFocusProp,
+  onBlur: onBlurProp,
+  ...restProps
 }: ThemedInputProps) {
   const theme = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
-  const borderColor = isFocused
-    ? PremiumPalette.champagneGold
-    : error
-      ? PremiumPalette.warmRed
-      : theme.inputBorder;
+  const handleFocus = useCallback(
+    (e: any) => {
+      setIsFocused(true);
+      onFocusProp?.(e);
+    },
+    [onFocusProp],
+  );
 
-  const focusShadow = isFocused
-    ? {
-        shadowColor: PremiumPalette.warmShadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.12,
-        shadowRadius: 6,
-        elevation: 3,
-      }
-    : Elevation.none;
+  const handleBlur = useCallback(
+    (e: any) => {
+      setIsFocused(false);
+      onBlurProp?.(e);
+    },
+    [onBlurProp],
+  );
+
+  // Border color: the ONLY visual focus indicator — no elevation change, no layer switch
+  const borderColor = useMemo(() => {
+    if (error) return '#ef4444';
+    if (isFocused) return '#6366f1';
+    return theme.inputBorder;
+  }, [isFocused, error, theme.inputBorder]);
+
+  // Background subtly brightens on focus — purely visual, no layout impact
+  const backgroundColor = useMemo(() => {
+    return isFocused
+      ? (theme.inputBackground as string)
+      : theme.backgroundSubtle;
+  }, [isFocused, theme.inputBackground, theme.backgroundSubtle]);
+
+  const inputStyleResolved = useMemo(
+    () => [
+      styles.input,
+      leftIcon ? styles.inputWithIcon : undefined,
+      { color: theme.text },
+      inputStyle,
+    ],
+    [leftIcon, theme.text, inputStyle],
+  );
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && (
+      {label ? (
         <Text style={[styles.label, { color: theme.textSecondary }]}>
           {label}
         </Text>
-      )}
+      ) : null}
       <View
         style={[
           styles.inputWrapper,
-          {
-            backgroundColor: isFocused
-              ? (theme.inputBackground as string)
-              : theme.backgroundSubtle,
-            borderColor,
-            ...(error ? { borderColor: PremiumPalette.warmRed } : {}),
-          },
-          focusShadow,
+          { backgroundColor, borderColor },
         ]}
       >
-        {leftIcon && (
+        {leftIcon ? (
           <View style={styles.iconContainer}>{leftIcon}</View>
-        )}
+        ) : null}
         <TextInput
-          style={[
-            styles.input,
-            leftIcon ? styles.inputWithIcon : undefined,
-            {
-              color: theme.text,
-            },
-            inputStyle,
-          ]}
+          style={inputStyleResolved}
           placeholderTextColor={theme.inputPlaceholder}
-          selectionColor={PremiumPalette.champagneGold}
-          onFocus={(e) => {
-            setIsFocused(true);
-            props.onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setIsFocused(false);
-            props.onBlur?.(e);
-          }}
-          {...props}
+          selectionColor="#6366f1"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...restProps}
         />
       </View>
-      {error && (
-        <Text style={[styles.error, { color: PremiumPalette.warmRed }]}>
+      {error ? (
+        <Text style={[styles.error, { color: '#ef4444' }]}>
           {error}
         </Text>
-      )}
-      {!error && hint && (
+      ) : null}
+      {!error && hint ? (
         <Text style={[styles.hint, { color: theme.textTertiary }]}>
           {hint}
         </Text>
-      )}
+      ) : null}
     </View>
   );
 }

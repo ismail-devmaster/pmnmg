@@ -4,14 +4,14 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import { Link } from 'expo-router';
-import { ThemedView, ThemedText, ThemedInput, ThemedButton } from '@/components';
+import { ThemedInput, ThemedButton } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/use-theme';
 import {
-  PremiumPalette,
-  Elevation,
   Radius,
   Spacing,
 } from '@/constants/theme';
@@ -30,6 +30,7 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const { register, loading } = useAuth();
+  const theme = useTheme();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -81,44 +82,30 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Hero Section — deep forest green gradient */}
-      <View style={styles.heroSection}>
-        <View style={styles.heroBackground} />
-        <View style={styles.heroOverlay} />
-        <View style={styles.heroContent}>
-          <View style={styles.heroRow}>
-            <View style={styles.brandMark}>
-              <ThemedText type="displayLarge" style={styles.brandLetter}>
-                +
-              </ThemedText>
-            </View>
-            <View style={styles.heroTextGroup}>
-              <ThemedText type="headline" style={styles.heroTitle}>
-                Create Account
-              </ThemedText>
-              <ThemedText type="body" style={styles.heroSubtitle}>
-                Join as a client
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-      </View>
-
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoiding}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {/* Glass form card */}
-          <View style={[styles.formCard, Elevation.high]}>
+          {/* Centered Form Card */}
+          <View style={[styles.formCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+            <View style={styles.formHeader}>
+              <Text style={[styles.formTitle, { color: theme.text }]}>
+                Create Account
+              </Text>
+              <Text style={[styles.formSubtitle, { color: theme.textSecondary }]}>
+                Join as a client
+              </Text>
+            </View>
+
             <View style={styles.formBody}>
               <ThemedInput
-                label="Full Name"
+                label="Name"
                 placeholder="John Doe"
                 value={name}
                 onChangeText={(text) => {
@@ -175,10 +162,10 @@ export default function RegisterScreen() {
               />
 
               <ThemedButton
-                title="Create Account"
+                title="Register"
                 onPress={handleRegister}
                 loading={loading}
-                variant="secondary"
+                variant="primary"
                 size="large"
                 fullWidth
                 style={styles.submitButton}
@@ -188,9 +175,9 @@ export default function RegisterScreen() {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <ThemedText type="body" themeColor="textSecondary">
-              Already have an account?{' '}
-            </ThemedText>
+            <Text style={[styles.footerText, { color: theme.textTertiary }]}>
+              Already registered?{' '}
+            </Text>
             <Link href="/(auth)/login" asChild>
               <ThemedButton
                 title="Sign In"
@@ -210,103 +197,50 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
   },
-
-  /* ── Hero ─────────────────────────────────────────────── */
-  heroSection: {
-    position: 'relative',
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingBottom: Spacing.six,
-    paddingHorizontal: Spacing.six,
-    overflow: 'hidden',
-  },
-  heroBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#1A3A2A',
-    borderBottomLeftRadius: Radius.xxl,
-    borderBottomRightRadius: Radius.xxl,
-  },
-  heroOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderBottomLeftRadius: Radius.xxl,
-    borderBottomRightRadius: Radius.xxl,
-    backgroundColor: 'rgba(201,169,97,0.06)',
-  },
-  heroContent: {
-    position: 'relative',
-    zIndex: 1,
-  },
-  heroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.five,
-  },
-  brandMark: {
-    width: 56,
-    height: 56,
-    borderRadius: Radius.xl,
-    backgroundColor: 'rgba(201,169,97,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(201,169,97,0.35)',
-  },
-  brandLetter: {
-    color: PremiumPalette.champagneGold,
-    fontWeight: '800',
-    fontSize: 28,
-  },
-  heroTextGroup: {
-    flex: 1,
-  },
-  heroTitle: {
-    color: '#FFFFFF',
-    letterSpacing: -0.3,
-  },
-  heroSubtitle: {
-    color: 'rgba(255,255,255,0.65)',
-    marginTop: 2,
-  },
-
-  /* ── Keyboard / Scroll ────────────────────────────────── */
   keyboardAvoiding: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: Spacing.six,
-    paddingTop: Spacing.five,
-    paddingBottom: Spacing.twenty,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.six,
+    paddingVertical: Spacing.twenty,
   },
-
-  /* ── Glass form card ──────────────────────────────────── */
   formCard: {
     borderRadius: Radius.xl,
-    backgroundColor: 'rgba(255,255,255,0.82)',
     borderWidth: 1,
-    borderColor: 'rgba(232,228,220,0.6)',
+    overflow: 'hidden',
+  },
+  formHeader: {
+    paddingHorizontal: Spacing.six,
+    paddingTop: Spacing.six,
+    paddingBottom: Spacing.four,
+  },
+  formTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    marginBottom: Spacing.one,
+  },
+  formSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
   },
   formBody: {
-    padding: Spacing.six,
+    paddingHorizontal: Spacing.six,
+    paddingBottom: Spacing.six,
   },
   submitButton: {
     marginTop: Spacing.two,
   },
-
-  /* ── Footer ───────────────────────────────────────────── */
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: Spacing.six,
+  },
+  footerText: {
+    fontSize: 14,
   },
 });
