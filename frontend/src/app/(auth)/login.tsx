@@ -7,9 +7,16 @@ import {
   View,
 } from 'react-native';
 import { Link } from 'expo-router';
-import { ThemedView, ThemedText, ThemedInput, ThemedButton } from '@/components';
+import { ThemedText, ThemedInput, ThemedButton } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
-import { Elevation, Radius, Spacing } from '@/constants/theme';
+import {
+  PremiumPalette,
+  Colors,
+  Elevation,
+  Radius,
+  Spacing,
+  Typography,
+} from '@/constants/theme';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -50,22 +57,33 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Decorative top area */}
+      {/* Premium Hero Section */}
       <View style={styles.heroSection}>
-        <View style={styles.heroBackground} />
+        <View style={styles.heroGradient} />
+        <View style={styles.geometricOverlay}>
+          <View style={styles.geoLine1} />
+          <View style={styles.geoLine2} />
+          <View style={styles.geoLine3} />
+          <View style={styles.geoDot1} />
+          <View style={styles.geoDot2} />
+          <View style={styles.geoDot3} />
+        </View>
         <View style={styles.heroContent}>
           <View style={styles.brandMark}>
-            <View style={styles.brandIcon}>
-              <ThemedText type="displayLarge" style={styles.brandLetter}>
-                P
-              </ThemedText>
-            </View>
+            <ThemedText type="displayHero" style={styles.brandLetter}>
+              P
+            </ThemedText>
           </View>
-          <ThemedText type="display" style={styles.heroTitle}>
-            Product
-          </ThemedText>
-          <ThemedText type="display" style={styles.heroTitleAccent}>
-            Manager
+          <View style={styles.titleGroup}>
+            <ThemedText type="display" style={styles.heroTitleLight}>
+              Product
+            </ThemedText>
+            <ThemedText type="display" style={styles.heroTitleGold}>
+              Manager
+            </ThemedText>
+          </View>
+          <ThemedText type="caption" style={styles.heroTagline}>
+            Premium Client Management
           </ThemedText>
         </View>
       </View>
@@ -79,66 +97,67 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Form Card */}
-          <ThemedView type="card" style={[styles.formCard, Elevation.high]}>
-            <View style={styles.formHeader}>
-              <ThemedText type="headline" style={styles.formTitle}>
-                Welcome back
-              </ThemedText>
-              <ThemedText
-                type="body"
-                themeColor="textSecondary"
-                style={styles.formSubtitle}
-              >
-                Sign in to your client account
-              </ThemedText>
+          {/* Glass Form Card */}
+          <View style={styles.formCardWrapper}>
+            <View style={[styles.formCard, Elevation.elevated]}>
+              <View style={styles.formHeader}>
+                <ThemedText type="headline" style={styles.formTitle}>
+                  Welcome back
+                </ThemedText>
+                <ThemedText
+                  type="body"
+                  style={styles.formSubtitle}
+                >
+                  Sign in to your client account
+                </ThemedText>
+              </View>
+
+              <View style={styles.formBody}>
+                <ThemedInput
+                  label="Email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    if (emailError) setEmailError('');
+                  }}
+                  error={emailError}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  autoComplete="email"
+                />
+
+                <ThemedInput
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (passwordError) setPasswordError('');
+                  }}
+                  error={passwordError}
+                  secureTextEntry
+                  textContentType="password"
+                  autoComplete="current-password"
+                />
+
+                <ThemedButton
+                  title="Sign In"
+                  onPress={handleLogin}
+                  loading={loading}
+                  variant="primary"
+                  size="large"
+                  fullWidth
+                  style={styles.submitButton}
+                />
+              </View>
             </View>
+          </View>
 
-            <View style={styles.formBody}>
-              <ThemedInput
-                label="Email"
-                placeholder="you@example.com"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) setEmailError('');
-                }}
-                error={emailError}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                textContentType="emailAddress"
-                autoComplete="email"
-              />
-
-              <ThemedInput
-                label="Password"
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (passwordError) setPasswordError('');
-                }}
-                error={passwordError}
-                secureTextEntry
-                textContentType="password"
-                autoComplete="current-password"
-              />
-
-              <ThemedButton
-                title="Sign In"
-                onPress={handleLogin}
-                loading={loading}
-                variant="primary"
-                size="large"
-                fullWidth
-                style={styles.submitButton}
-              />
-            </View>
-          </ThemedView>
-
-          {/* Footer link */}
+          {/* Footer */}
           <View style={styles.footer}>
-            <ThemedText type="body" themeColor="textSecondary">
+            <ThemedText type="body" style={styles.footerText}>
               Don&apos;t have an account?{' '}
             </ThemedText>
             <Link href="/(auth)/register" asChild>
@@ -160,74 +179,151 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: Colors.light.background,
   },
   heroSection: {
     position: 'relative',
-    paddingTop: Platform.OS === 'ios' ? 80 : 60,
-    paddingBottom: Spacing.eight,
+    paddingTop: Platform.OS === 'ios' ? 96 : 72,
+    paddingBottom: Spacing.ten,
     paddingHorizontal: Spacing.six,
     overflow: 'hidden',
   },
-  heroBackground: {
+  heroGradient: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#1E3A5F',
-    borderBottomLeftRadius: Radius.xxl,
-    borderBottomRightRadius: Radius.xxl,
+    backgroundColor: PremiumPalette.navy,
+  },
+  geometricOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+  },
+  geoLine1: {
+    position: 'absolute',
+    top: 20,
+    right: -40,
+    width: 200,
+    height: 1,
+    backgroundColor: 'rgba(201, 169, 97, 0.12)',
+    transform: [{ rotate: '-30deg' }],
+  },
+  geoLine2: {
+    position: 'absolute',
+    top: 60,
+    right: -20,
+    width: 160,
+    height: 1,
+    backgroundColor: 'rgba(201, 169, 97, 0.08)',
+    transform: [{ rotate: '-30deg' }],
+  },
+  geoLine3: {
+    position: 'absolute',
+    bottom: 30,
+    left: -30,
+    width: 180,
+    height: 1,
+    backgroundColor: 'rgba(201, 169, 97, 0.1)',
+    transform: [{ rotate: '30deg' }],
+  },
+  geoDot1: {
+    position: 'absolute',
+    top: 40,
+    left: 30,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(201, 169, 97, 0.15)',
+  },
+  geoDot2: {
+    position: 'absolute',
+    top: 80,
+    right: 50,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(201, 169, 97, 0.1)',
+  },
+  geoDot3: {
+    position: 'absolute',
+    bottom: 50,
+    right: 80,
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: 'rgba(201, 169, 97, 0.12)',
   },
   heroContent: {
     alignItems: 'center',
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
   brandMark: {
-    marginBottom: Spacing.five,
-  },
-  brandIcon: {
-    width: 72,
-    height: 72,
+    width: 80,
+    height: 80,
     borderRadius: Radius.xl,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 2,
+    borderColor: PremiumPalette.champagneGold,
+    shadowColor: PremiumPalette.champagneGold,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+    marginBottom: Spacing.five,
   },
   brandLetter: {
-    color: '#FFFFFF',
-    fontWeight: '800',
+    color: PremiumPalette.champagneGold,
   },
-  heroTitle: {
+  titleGroup: {
+    alignItems: 'center',
+  },
+  heroTitleLight: {
     color: '#FFFFFF',
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: '300',
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
-  heroTitleAccent: {
-    color: '#FBBF24',
+  heroTitleGold: {
+    color: PremiumPalette.champagneGold,
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: '700',
-    letterSpacing: -0.3,
-    marginTop: -4,
+    letterSpacing: -0.5,
+    marginTop: -2,
+  },
+  heroTagline: {
+    color: 'rgba(255, 255, 255, 0.45)',
+    textAlign: 'center',
+    marginTop: Spacing.three,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   keyboardAvoiding: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: Spacing.six,
-    paddingTop: Spacing.five,
+    paddingHorizontal: Spacing.six,
+    paddingTop: Spacing.four,
     paddingBottom: Spacing.twenty,
   },
+  formCardWrapper: {
+    marginTop: Spacing.three,
+  },
   formCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
     borderRadius: Radius.xl,
     borderWidth: 1,
+    borderColor: 'rgba(232, 228, 220, 0.6)',
     overflow: 'hidden',
   },
   formHeader: {
@@ -240,18 +336,22 @@ const styles = StyleSheet.create({
   },
   formSubtitle: {
     marginTop: Spacing.one,
+    color: Colors.light.textSecondary,
   },
   formBody: {
     paddingHorizontal: Spacing.six,
     paddingBottom: Spacing.six,
   },
   submitButton: {
-    marginTop: Spacing.two,
+    marginTop: Spacing.three,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: Spacing.six,
+  },
+  footerText: {
+    color: Colors.light.textSecondary,
   },
 });

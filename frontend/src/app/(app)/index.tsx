@@ -10,7 +10,13 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
-import { Elevation, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import {
+  Elevation,
+  MaxContentWidth,
+  PremiumPalette,
+  Radius,
+  Spacing,
+} from '@/constants/theme';
 
 export default function ProductListScreen() {
   const { user, logout } = useAuth();
@@ -29,7 +35,7 @@ export default function ProductListScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <View style={styles.emptyIcon}>
+      <View style={styles.emptyIconCircle}>
         <ThemedText type="display" style={styles.emptyIconText}>
           +
         </ThemedText>
@@ -49,12 +55,19 @@ export default function ProductListScreen() {
 
   const renderError = () => (
     <View style={styles.emptyContainer}>
-      <View style={[styles.emptyIcon, styles.errorIcon]}>
-        <ThemedText type="display" style={[styles.emptyIconText, styles.errorIconText]}>
+      <View style={[styles.emptyIconCircle, styles.errorIconCircle]}>
+        <ThemedText
+          type="display"
+          style={[styles.emptyIconText, styles.errorIconText]}
+        >
           !
         </ThemedText>
       </View>
-      <ThemedText type="titleSmall" themeColor="error" style={styles.emptyTitle}>
+      <ThemedText
+        type="titleSmall"
+        themeColor="error"
+        style={styles.emptyTitle}
+      >
         Something went wrong
       </ThemedText>
       <ThemedText
@@ -78,8 +91,20 @@ export default function ProductListScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ThemedView type="card" style={[styles.loadingCard, Elevation.medium]}>
-          <ThemedText type="body" themeColor="textSecondary" style={styles.loadingText}>
+        <ThemedView
+          type="card"
+          style={[styles.loadingCard, Elevation.medium]}
+        >
+          <View style={styles.loadingDotRow}>
+            <View style={[styles.loadingDot, styles.loadingDot1]} />
+            <View style={[styles.loadingDot, styles.loadingDot2]} />
+            <View style={[styles.loadingDot, styles.loadingDot3]} />
+          </View>
+          <ThemedText
+            type="body"
+            themeColor="textSecondary"
+            style={styles.loadingText}
+          >
             Loading products...
           </ThemedText>
         </ThemedView>
@@ -89,11 +114,11 @@ export default function ProductListScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <ThemedView type="backgroundElement" style={[styles.header, Elevation.low]}>
+      {/* Premium Header */}
+      <View style={[styles.header, Elevation.low]}>
         <View style={styles.headerContent}>
           <View>
-            <ThemedText type="overline" themeColor="primary" style={styles.headerGreeting}>
+            <ThemedText type="overline" style={styles.headerGreeting}>
               {getGreeting()} {user?.name?.split(' ')[0] ?? ''}
             </ThemedText>
             <ThemedText type="headline" style={styles.headerTitle}>
@@ -106,13 +131,18 @@ export default function ProductListScreen() {
             variant="ghost"
             size="small"
             fullWidth={false}
+            style={styles.signOutButton}
           />
         </View>
-      </ThemedView>
+      </View>
 
-      {/* Product count bar */}
+      {/* Product Count Bar */}
       <View style={styles.countBar}>
-        <ThemedText type="labelSmall" themeColor="textTertiary" style={styles.countText}>
+        <ThemedText
+          type="labelSmall"
+          themeColor="textTertiary"
+          style={styles.countText}
+        >
           {products.length} {products.length === 1 ? 'PRODUCT' : 'PRODUCTS'}
         </ThemedText>
       </View>
@@ -132,8 +162,8 @@ export default function ProductListScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
-            colors={['#2563EB']}
+            tintColor={PremiumPalette.champagneGold}
+            colors={[PremiumPalette.champagneGold]}
           />
         }
       />
@@ -151,14 +181,17 @@ function getGreeting(): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: PremiumPalette.pearl,
   },
+
+  /* ── Header ─────────────────────────────────────────── */
   header: {
     paddingTop: Platform.OS === 'ios' ? 60 : 48,
     paddingBottom: Spacing.five,
     paddingHorizontal: Spacing.six,
     borderBottomLeftRadius: Radius.xl,
     borderBottomRightRadius: Radius.xl,
+    backgroundColor: PremiumPalette.navy,
   },
   headerContent: {
     flexDirection: 'row',
@@ -168,18 +201,28 @@ const styles = StyleSheet.create({
   headerGreeting: {
     letterSpacing: 1.5,
     marginBottom: Spacing.one,
+    color: PremiumPalette.champagneGold,
   },
   headerTitle: {
     letterSpacing: -0.3,
+    color: '#FFFFFF',
   },
+  signOutButton: {
+    opacity: 0.85,
+  },
+
+  /* ── Count Bar ──────────────────────────────────────── */
   countBar: {
     paddingHorizontal: Spacing.six,
     paddingTop: Spacing.four,
     paddingBottom: Spacing.two,
   },
   countText: {
-    letterSpacing: 2,
+    letterSpacing: 2.5,
+    fontWeight: '600',
   },
+
+  /* ── List ───────────────────────────────────────────── */
   listContainer: {
     paddingHorizontal: Spacing.six,
     paddingBottom: Spacing.twenty,
@@ -191,53 +234,79 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+
+  /* ── Empty State ────────────────────────────────────── */
   emptyContainer: {
     alignItems: 'center',
     paddingVertical: Spacing.twenty,
   },
-  emptyIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: Radius.xxl,
-    backgroundColor: '#EEF0F6',
+  emptyIconCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: Radius.full,
+    backgroundColor: '#F0EDE6',
+    borderWidth: 1.5,
+    borderColor: PremiumPalette.champagneGoldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.six,
   },
   emptyIconText: {
-    color: '#9CA3AF',
+    color: PremiumPalette.champagneGold,
     fontSize: 36,
     fontWeight: '300',
   },
-  errorIcon: {
-    backgroundColor: '#FEE2E2',
-  },
-  errorIconText: {
-    color: '#DC2626',
-    fontWeight: '700',
-  },
   emptyTitle: {
     marginBottom: Spacing.two,
+    color: PremiumPalette.obsidian,
   },
   emptySubtitle: {
     textAlign: 'center',
     maxWidth: 280,
   },
+
+  /* ── Error State ────────────────────────────────────── */
+  errorIconCircle: {
+    backgroundColor: PremiumPalette.warmRedLight,
+    borderColor: PremiumPalette.warmRed,
+  },
+  errorIconText: {
+    color: PremiumPalette.warmRed,
+    fontWeight: '700',
+  },
   retryButton: {
     marginTop: Spacing.five,
     paddingHorizontal: Spacing.six,
   },
+
+  /* ── Loading State ──────────────────────────────────── */
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F8F9FC',
+    backgroundColor: PremiumPalette.pearl,
   },
   loadingCard: {
     paddingHorizontal: Spacing.eight,
-    paddingVertical: Spacing.five,
+    paddingVertical: Spacing.six,
     borderRadius: Radius.xl,
+    alignItems: 'center',
   },
+  loadingDotRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+    marginBottom: Spacing.three,
+  },
+  loadingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: Radius.full,
+    backgroundColor: PremiumPalette.champagneGold,
+    opacity: 0.3,
+  },
+  loadingDot1: { opacity: 1 },
+  loadingDot2: { opacity: 0.6 },
+  loadingDot3: { opacity: 0.3 },
   loadingText: {
     letterSpacing: 0.5,
   },

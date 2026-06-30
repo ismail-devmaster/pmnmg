@@ -8,7 +8,14 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Collapsible } from '@/components/ui/collapsible';
 import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Elevation, Radius, Spacing } from '@/constants/theme';
+import {
+  BottomTabInset,
+  MaxContentWidth,
+  PremiumPalette,
+  Elevation,
+  Radius,
+  Spacing,
+} from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function TabTwoScreen() {
@@ -34,7 +41,7 @@ export default function TabTwoScreen() {
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: '#F8F9FC' }]}
+      style={[styles.scrollView, { backgroundColor: PremiumPalette.obsidian }]}
       contentInset={insets}
       contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}
     >
@@ -42,7 +49,7 @@ export default function TabTwoScreen() {
         {/* Hero header */}
         <View style={styles.heroHeader}>
           <View style={styles.heroDot} />
-          <ThemedText type="overline" themeColor="primary" style={styles.heroOverline}>
+          <ThemedText type="overline" themeColor="secondary" style={styles.heroOverline}>
             Explore
           </ThemedText>
           <ThemedText type="headline" style={styles.heroTitle}>
@@ -59,16 +66,16 @@ export default function TabTwoScreen() {
 
           <ExternalLink href="https://docs.expo.dev" asChild>
             <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="primary" style={styles.linkButton}>
+              <View style={styles.linkButton}>
                 <ThemedText type="label" style={styles.linkButtonText}>
                   Expo Documentation
                 </ThemedText>
                 <SymbolView
-                  tintColor="#FFFFFF"
+                  tintColor={PremiumPalette.obsidian}
                   name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
                   size={12}
                 />
-              </ThemedView>
+              </View>
             </Pressable>
           </ExternalLink>
         </View>
@@ -85,7 +92,7 @@ export default function TabTwoScreen() {
               the tab navigator.
             </ThemedText>
             <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="label" themeColor="primary">
+              <ThemedText type="label" themeColor="secondary">
                 Learn more
               </ThemedText>
             </ExternalLink>
@@ -113,7 +120,7 @@ export default function TabTwoScreen() {
             </ThemedText>
             <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
             <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="label" themeColor="primary">
+              <ThemedText type="label" themeColor="secondary">
                 Learn more
               </ThemedText>
             </ExternalLink>
@@ -126,7 +133,7 @@ export default function TabTwoScreen() {
               user&apos;s current color scheme, and adjust UI colors accordingly.
             </ThemedText>
             <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="label" themeColor="primary">
+              <ThemedText type="label" themeColor="secondary">
                 Learn more
               </ThemedText>
             </ExternalLink>
@@ -159,31 +166,37 @@ const styles = StyleSheet.create({
   container: {
     maxWidth: MaxContentWidth,
     flexGrow: 1,
+    backgroundColor: PremiumPalette.obsidian,
   },
   heroHeader: {
     alignItems: 'center',
     paddingHorizontal: Spacing.six,
-    paddingVertical: Spacing.sixteen,
+    paddingTop: Spacing.twenty,
+    paddingBottom: Spacing.twelve,
     gap: Spacing.three,
+    backgroundColor: PremiumPalette.obsidian,
   },
   heroDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#2563EB',
+    backgroundColor: PremiumPalette.champagneGold,
     marginBottom: Spacing.two,
   },
   heroOverline: {
     letterSpacing: 2,
+    color: PremiumPalette.champagneGold,
   },
   heroTitle: {
     textAlign: 'center',
     letterSpacing: -0.5,
+    color: PremiumPalette.pearl,
   },
   heroDescription: {
     textAlign: 'center',
     maxWidth: 360,
     lineHeight: 24,
+    color: PremiumPalette.pearlMuted,
   },
   pressed: {
     opacity: 0.7,
@@ -193,13 +206,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.six,
     paddingVertical: Spacing.four,
     borderRadius: Radius.lg,
+    backgroundColor: PremiumPalette.champagneGold,
     justifyContent: 'center',
     gap: Spacing.two,
     alignItems: 'center',
     marginTop: Spacing.two,
   },
   linkButtonText: {
-    color: '#FFFFFF',
+    color: PremiumPalette.obsidian,
+    fontWeight: '600',
   },
   sectionsWrapper: {
     gap: Spacing.five,
@@ -210,6 +225,9 @@ const styles = StyleSheet.create({
   collapsibleContent: {
     alignItems: 'center',
     borderRadius: Radius.lg,
+    backgroundColor: PremiumPalette.obsidianLight,
+    borderWidth: 1,
+    borderColor: '#1E1F26',
   },
   collapsibleGap: {
     marginTop: Spacing.two,

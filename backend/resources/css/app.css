@@ -1,3 +1,208 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --color-bg-primary: #0a0a1a;
+        --color-bg-secondary: #12122b;
+        --color-bg-tertiary: #1a1a3e;
+        --color-border: rgba(99, 102, 241, 0.12);
+        --color-border-hover: rgba(99, 102, 241, 0.25);
+        --color-text-primary: #f0f0f5;
+        --color-text-secondary: #a8a8c0;
+        --color-accent: #6366f1;
+        --color-accent-glow: rgba(99, 102, 241, 0.15);
+    }
+
+    body {
+        @apply bg-obsidian-950 text-obsidian-100 antialiased;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    }
+
+    /* Premium scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-obsidian-900;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-obsidian-600 rounded-full;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-electric-500;
+    }
+}
+
+@layer components {
+    /* Glass card */
+    .glass-card {
+        @apply bg-obsidian-800/60 backdrop-blur-xl border border-obsidian-600/20 rounded-2xl;
+    }
+
+    /* Premium card */
+    .premium-card {
+        @apply bg-gradient-to-br from-obsidian-800/80 to-obsidian-900/60 
+               backdrop-blur-xl border border-obsidian-600/15 rounded-2xl
+               shadow-card transition-all duration-300;
+    }
+    .premium-card:hover {
+        @apply shadow-card-hover border-electric-500/20;
+    }
+
+    /* Gradient text */
+    .gradient-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-electric-400 via-electric-300 to-emerald-400;
+    }
+
+    /* Premium button */
+    .btn-premium {
+        @apply relative inline-flex items-center gap-2 px-5 py-2.5 
+               bg-gradient-to-r from-electric-600 to-electric-500
+               text-white font-semibold text-sm rounded-xl
+               shadow-glow transition-all duration-300
+               hover:shadow-glow-lg hover:from-electric-500 hover:to-electric-400
+               active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:ring-offset-2 focus:ring-offset-obsidian-900;
+    }
+
+    .btn-premium::before {
+        content: '';
+        @apply absolute inset-0 rounded-xl bg-gradient-to-r from-white/10 to-transparent opacity-0 transition-opacity duration-300;
+    }
+    .btn-premium:hover::before {
+        @apply opacity-100;
+    }
+
+    /* Ghost button */
+    .btn-ghost {
+        @apply inline-flex items-center gap-2 px-4 py-2
+               text-obsidian-200 font-medium text-sm rounded-xl
+               border border-obsidian-600/30 
+               hover:bg-obsidian-700/50 hover:text-white hover:border-obsidian-500/40
+               transition-all duration-200
+               active:scale-[0.98];
+    }
+
+    /* Danger button */
+    .btn-danger {
+        @apply inline-flex items-center gap-2 px-4 py-2
+               bg-red-500/10 text-red-400 font-medium text-sm rounded-xl
+               border border-red-500/20
+               hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30
+               transition-all duration-200
+               active:scale-[0.98];
+    }
+
+    /* Premium input */
+    .input-premium {
+        @apply w-full bg-obsidian-900/60 border border-obsidian-600/30
+               rounded-xl px-4 py-3 text-obsidian-100
+               placeholder:text-obsidian-400
+               focus:border-electric-500/50 focus:ring-2 focus:ring-electric-500/20 focus:outline-none
+               transition-all duration-200;
+    }
+
+    /* Premium textarea */
+    .textarea-premium {
+        @apply w-full bg-obsidian-900/60 border border-obsidian-600/30
+               rounded-xl px-4 py-3 text-obsidian-100
+               placeholder:text-obsidian-400
+               focus:border-electric-500/50 focus:ring-2 focus:ring-electric-500/20 focus:outline-none
+               transition-all duration-200 resize-none;
+    }
+
+    /* Premium label */
+    .label-premium {
+        @apply block text-sm font-semibold text-obsidian-200 mb-2;
+    }
+
+    /* Premium table */
+    .table-premium {
+        @apply w-full text-left;
+    }
+    .table-premium thead {
+        @apply border-b border-obsidian-600/30;
+    }
+    .table-premium th {
+        @apply px-6 py-4 text-xs font-bold uppercase tracking-wider text-obsidian-400;
+    }
+    .table-premium td {
+        @apply px-6 py-4 text-sm text-obsidian-200;
+    }
+    .table-premium tbody tr {
+        @apply border-b border-obsidian-700/30 transition-colors duration-150;
+    }
+    .table-premium tbody tr:hover {
+        @apply bg-obsidian-700/20;
+    }
+
+    /* Stat card */
+    .stat-card {
+        @apply premium-card p-6 flex items-center gap-4;
+    }
+    .stat-icon {
+        @apply p-3 rounded-xl;
+    }
+
+    /* Badge */
+    .badge-admin {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+               bg-amber-500/15 text-amber-400 text-xs font-bold uppercase tracking-wide
+               border border-amber-500/20;
+    }
+    .badge-client {
+        @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+               bg-emerald-500/15 text-emerald-400 text-xs font-bold uppercase tracking-wide
+               border border-emerald-500/20;
+    }
+
+    /* Sidebar link */
+    .sidebar-link {
+        @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+               text-obsidian-300 transition-all duration-200
+               hover:bg-obsidian-700/40 hover:text-white;
+    }
+    .sidebar-link-active {
+        @apply bg-electric-600/15 text-electric-400 border border-electric-500/20;
+    }
+
+    /* Pagination */
+    .pagination-link {
+        @apply inline-flex items-center justify-center w-9 h-9 rounded-lg
+               text-sm font-medium text-obsidian-300 border border-obsidian-600/30
+               hover:bg-obsidian-700/50 hover:text-white hover:border-obsidian-500/40
+               transition-all duration-200;
+    }
+    .pagination-link-active {
+        @apply bg-electric-600 text-white border-electric-500 shadow-glow;
+    }
+
+    /* Flash message */
+    .flash-success {
+        @apply bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 
+               rounded-xl px-5 py-3 text-sm font-medium;
+    }
+
+    /* Empty state */
+    .empty-state {
+        @apply py-16 text-center text-obsidian-400;
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+        @apply fixed inset-0 z-50 bg-black/60 backdrop-blur-sm;
+    }
+    .modal-content {
+        @apply premium-card p-6 max-w-md w-full mx-4;
+    }
+}
+
+@layer utilities {
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    .stagger-5 { animation-delay: 0.25s; }
+}

@@ -9,7 +9,12 @@ import {
 import { Link } from 'expo-router';
 import { ThemedView, ThemedText, ThemedInput, ThemedButton } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
-import { Elevation, Radius, Spacing } from '@/constants/theme';
+import {
+  PremiumPalette,
+  Elevation,
+  Radius,
+  Spacing,
+} from '@/constants/theme';
 
 interface FormErrors {
   name?: string;
@@ -77,12 +82,13 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Decorative top area */}
+      {/* Hero Section — deep forest green gradient */}
       <View style={styles.heroSection}>
-        <View style={[styles.heroBackground, styles.heroBackgroundAlt]} />
+        <View style={styles.heroBackground} />
+        <View style={styles.heroOverlay} />
         <View style={styles.heroContent}>
           <View style={styles.heroRow}>
-            <View style={[styles.brandMark, styles.brandMarkAlt]}>
+            <View style={styles.brandMark}>
               <ThemedText type="displayLarge" style={styles.brandLetter}>
                 +
               </ThemedText>
@@ -108,8 +114,8 @@ export default function RegisterScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Form Card */}
-          <ThemedView type="card" style={[styles.formCard, Elevation.high]}>
+          {/* Glass form card */}
+          <View style={[styles.formCard, Elevation.high]}>
             <View style={styles.formBody}>
               <ThemedInput
                 label="Full Name"
@@ -178,9 +184,9 @@ export default function RegisterScreen() {
                 style={styles.submitButton}
               />
             </View>
-          </ThemedView>
+          </View>
 
-          {/* Footer link */}
+          {/* Footer */}
           <View style={styles.footer}>
             <ThemedText type="body" themeColor="textSecondary">
               Already have an account?{' '}
@@ -206,6 +212,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FC',
   },
+
+  /* ── Hero ─────────────────────────────────────────────── */
   heroSection: {
     position: 'relative',
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
@@ -219,12 +227,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#1E3A5F',
+    backgroundColor: '#1A3A2A',
     borderBottomLeftRadius: Radius.xxl,
     borderBottomRightRadius: Radius.xxl,
   },
-  heroBackgroundAlt: {
-    backgroundColor: '#064E3B',
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderBottomLeftRadius: Radius.xxl,
+    borderBottomRightRadius: Radius.xxl,
+    backgroundColor: 'rgba(201,169,97,0.06)',
   },
   heroContent: {
     position: 'relative',
@@ -239,15 +254,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: Radius.xl,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(201,169,97,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(201,169,97,0.35)',
   },
-  brandMarkAlt: {},
   brandLetter: {
-    color: '#FFFFFF',
+    color: PremiumPalette.champagneGold,
     fontWeight: '800',
     fontSize: 28,
   },
@@ -259,9 +273,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   heroSubtitle: {
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.65)',
     marginTop: 2,
   },
+
+  /* ── Keyboard / Scroll ────────────────────────────────── */
   keyboardAvoiding: {
     flex: 1,
   },
@@ -271,9 +287,13 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.five,
     paddingBottom: Spacing.twenty,
   },
+
+  /* ── Glass form card ──────────────────────────────────── */
   formCard: {
     borderRadius: Radius.xl,
+    backgroundColor: 'rgba(255,255,255,0.82)',
     borderWidth: 1,
+    borderColor: 'rgba(232,228,220,0.6)',
   },
   formBody: {
     padding: Spacing.six,
@@ -281,6 +301,8 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: Spacing.two,
   },
+
+  /* ── Footer ───────────────────────────────────────────── */
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',

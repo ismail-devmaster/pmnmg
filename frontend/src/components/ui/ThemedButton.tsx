@@ -7,9 +7,9 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useTheme } from '@/hooks/use-theme';
-import { Radius, Spacing } from '@/constants/theme';
+import { Elevation, PremiumPalette, Radius, Spacing } from '@/constants/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'danger' | 'ghost' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'danger' | 'ghost' | 'outline' | 'premium';
 
 export interface ThemedButtonProps extends Omit<TouchableOpacityProps, 'style' | 'onPress'> {
   title: string;
@@ -25,28 +25,83 @@ export interface ThemedButtonProps extends Omit<TouchableOpacityProps, 'style' |
 
 const VARIANT_CONFIG = {
   primary: {
-    light: { bg: '#2563EB', text: '#FFFFFF', border: '#2563EB' },
-    dark: { bg: '#60A5FA', text: '#0F1117', border: '#60A5FA' },
+    light: { bg: '#1B2A4A', text: '#FFFFFF', border: '#1B2A4A' },
+    dark: { bg: '#2A4070', text: '#F5F0E8', border: '#2A4070' },
   },
   secondary: {
-    light: { bg: '#059669', text: '#FFFFFF', border: '#059669' },
-    dark: { bg: '#34D399', text: '#0F1117', border: '#34D399' },
+    light: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
+    dark: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
   },
   accent: {
     light: { bg: '#D97706', text: '#FFFFFF', border: '#D97706' },
-    dark: { bg: '#FBBF24', text: '#0F1117', border: '#FBBF24' },
+    dark: { bg: '#FBBF24', text: PremiumPalette.obsidian, border: '#FBBF24' },
   },
   danger: {
     light: { bg: '#DC2626', text: '#FFFFFF', border: '#DC2626' },
-    dark: { bg: '#F87171', text: '#0F1117', border: '#F87171' },
+    dark: { bg: '#F87171', text: PremiumPalette.obsidian, border: '#F87171' },
   },
   ghost: {
-    light: { bg: 'transparent', text: '#2563EB', border: 'transparent' },
-    dark: { bg: 'transparent', text: '#60A5FA', border: 'transparent' },
+    light: { bg: 'transparent', text: PremiumPalette.champagneGold, border: 'transparent' },
+    dark: { bg: 'transparent', text: PremiumPalette.champagneGold, border: 'transparent' },
   },
   outline: {
-    light: { bg: 'transparent', text: '#2563EB', border: '#2563EB' },
-    dark: { bg: 'transparent', text: '#60A5FA', border: '#60A5FA' },
+    light: { bg: 'transparent', text: PremiumPalette.champagneGold, border: PremiumPalette.champagneGold },
+    dark: { bg: 'transparent', text: PremiumPalette.champagneGold, border: PremiumPalette.champagneGold },
+  },
+  premium: {
+    light: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
+    dark: { bg: PremiumPalette.champagneGold, text: PremiumPalette.obsidian, border: PremiumPalette.champagneGold },
+  },
+} as const;
+
+const VARIANT_SHADOW = {
+  primary: {
+    light: {
+      shadowColor: '#1B2A4A',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    dark: {
+      shadowColor: '#2A4070',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+  },
+  secondary: {
+    light: {
+      shadowColor: PremiumPalette.warmShadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    dark: {
+      shadowColor: PremiumPalette.champagneGoldDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+  },
+  premium: {
+    light: {
+      shadowColor: PremiumPalette.warmShadow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 5,
+    },
+    dark: {
+      shadowColor: PremiumPalette.champagneGoldDark,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 10,
+      elevation: 5,
+    },
   },
 } as const;
 
@@ -98,6 +153,10 @@ export function ThemedButton({
     return 1;
   };
 
+  const shadowStyle = (VARIANT_SHADOW as Record<string, Record<string, ViewStyle>>)[variant]
+    ? (VARIANT_SHADOW as Record<string, Record<string, ViewStyle>>)[variant][isDark ? 'dark' : 'light']
+    : Elevation.none;
+
   return (
     <TouchableOpacity
       style={[
@@ -111,13 +170,14 @@ export function ThemedButton({
           minHeight: sizeConfig.minHeight,
           opacity: getOpacity(),
         },
+        shadowStyle,
         fullWidth && styles.fullWidth,
         variant === 'ghost' && styles.ghost,
         style,
       ]}
       onPress={isDisabled ? undefined : onPress}
       disabled={isDisabled}
-      activeOpacity={0.7}
+      activeOpacity={0.75}
       {...props}
     >
       {loading ? (
