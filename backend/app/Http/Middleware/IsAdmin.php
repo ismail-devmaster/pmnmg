@@ -11,12 +11,12 @@ class IsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         // Check if user is authenticated and has the 'admin' role
-        if ($request->user() && $request->user()->role === 'admin') {
+        if ($request->user() && $request->user()->isAdmin()) {
             return $next($request);
         }
 
         return response()->json([
-            'message' => 'Forbidden. Admin access required.'
+            'message' => 'Forbidden. Admin access required.',
         ], 403);
     }
 }

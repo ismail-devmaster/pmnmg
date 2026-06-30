@@ -3,64 +3,52 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProductController extends Controller
 {
-    // 5.2 GET - List all products (All Roles)
-    public function index()
+    /**
+     * Display a listing of all products.
+     */
+    public function index(): AnonymousResourceCollection
     {
-        $products = Product::all();
-        return ProductResource::collection($products);
+        return ProductResource::collection(Product::all());
     }
 
-    // 5.3 POST - Create a product (Admin Only)
-    public function store(Request $request)
+    /**
+     * Store a newly created product in storage.
+     */
+    public function store(StoreProductRequest $request): ProductResource
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-        ]);
-
-        $product = Product::create($validated);
+        $product = Product::create($request->validated());
 
         return new ProductResource($product);
     }
 
-    // 5.4 PUT - Update a product (Admin Only)
-    public function update(Request $request, $id)
+    /**
+     * Update the specified product in storage.
+     */
+    public function update(UpdateProductRequest $request, Product $product): ProductResource
     {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|required|numeric|min:0',
-        ]);
-
-        $product->update($validated);
+        $product->update($request->validated());
 
         return new ProductResource($product);
     }
 
-    // 5.5 DELETE - Remove a product (Admin Only)
-    public function destroy($id)
+    /**
+     * Remove the specified product from storage.
+     */
+    public function destroy(Product $product): JsonResponse
     {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
         $product->delete();
 
-        return response()->json(['message' => 'Product deleted successfully']);
+        return response()->json([
+            'message' => 'Product deleted successfully',
+        ], 200);
     }
 }

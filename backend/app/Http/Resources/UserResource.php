@@ -13,13 +13,13 @@ class UserResource extends JsonResource
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
-{
-    return [
-        'id' => $this->id,
-        'name' => $this->name,
-        'email' => $this->email,
-        'role' => $this->role,
-        'created_at' => $this->created_at,
-    ];
-}
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role,
+            'created_at' => $this->created_at,
+        ];
+    }
 }
