@@ -136,6 +136,21 @@ export default function LoginScreen() {
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.textTertiary }]}>
+              Don&apos;t have an account?{' '}
+            </Text>
+            <Link href="/(auth)/register" asChild>
+              <ThemedButton
+                title="Register"
+                onPress={() => {}}
+                variant="ghost"
+                size="small"
+                fullWidth={false}
+              />
+            </Link>
+          </View>
+
+          <View style={styles.footerBottom}>
+            <Text style={[styles.footerText, { color: theme.textTertiary }]}>
               Client portal — For authorized users only
             </Text>
           </View>
@@ -219,8 +234,14 @@ const styles = StyleSheet.create({
     marginTop: Spacing.three,
   },
   footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: Spacing.eight,
+    marginTop: Spacing.six,
+  },
+  footerBottom: {
+    alignItems: 'center',
+    marginTop: Spacing.three,
   },
   footerText: {
     fontSize: 12,
