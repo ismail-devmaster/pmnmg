@@ -1,6 +1,7 @@
+.git
+.github
 vendor
 node_modules
-.git
 .env
 storage/logs
 storage/framework/cache
