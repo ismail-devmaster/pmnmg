@@ -34,8 +34,14 @@ Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-    Route::get('/products', [ProductController::class, 'index']);
-
     // Phase 6: User Listing
     Route::get('/users', [UserController::class, 'index']);
+});
+/*
+|--------------------------------------------------------------------------
+| Get Products Routes (All Roles: Admin & Client)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/products', [ProductController::class, 'index']);
 });
