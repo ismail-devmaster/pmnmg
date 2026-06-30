@@ -1,22 +1,19 @@
 import { Redirect } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { getToken } from '@/utils/storage';
+import { ThemedView, ThemedText } from '@/components';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Index() {
-  const [loading, setLoading] = useState(true);
-  const [hasToken, setHasToken] = useState(false);
+  const { loading, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = await getToken();
-      setHasToken(!!token);
-      setLoading(false);
-    };
+  if (loading) {
+    return (
+      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ThemedText type="body" themeColor="textSecondary">
+          Loading...
+        </ThemedText>
+      </ThemedView>
+    );
+  }
 
-    checkAuth();
-  }, []);
-
-  if (loading) return null;
-
-  return <Redirect href={hasToken ? '/(app)' : '/(auth)/login'} />;
+  return <Redirect href={isAuthenticated ? '/(app)' : '/(auth)/login'} />;
 }

@@ -1,150 +1,244 @@
-import { useState, useCallback } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
-import api from '@/api/axios';
-import { removeToken } from '@/utils/storage';
-import ProductCard from '@/components/ProductCard';
+import { Platform, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
+import {
+  ThemedView,
+  ThemedText,
+  ThemedButton,
+  ProductCard,
+} from '@/components';
+import { useAuth } from '@/hooks/useAuth';
+import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
+import { Elevation, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 
 export default function ProductListScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const router = useRouter();
+  const { user, logout } = useAuth();
+  const { products, loading, refreshing, error, onRefresh, fetchProducts } =
+    useProducts();
 
-  // Fetch products from API
-  const fetchProducts = async (showLoader = true) => {
-    if (showLoader) setLoading(true);
-    try {
-      const response = await api.get('/products');
-      setProducts(response.data.data || response.data);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load products. Please try again.');
-    } finally {
-      if (showLoader) setLoading(false);
-    }
-  };
-
-  // ✅ Refresh when screen comes into focus (e.g., after login)
   useFocusEffect(
     useCallback(() => {
       fetchProducts();
-    }, [])
+    }, [fetchProducts])
   );
 
-  // Pull-to-refresh functionality
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchProducts(false);
-    setRefreshing(false);
-  }, []);
-
-  // ✅ Logout logic - fixed navigation
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    try {
-      await api.post('/logout');
-    } catch (error) {
-      console.log('Logout API error (proceeding with local logout):', error);
-    } finally {
-      await removeToken();
-      
-      // ✅ FIX: Clear stack then navigate to login so user can't go back
-      if (router.canDismiss?.()) {
-        router.dismissAll();
-      }
-      router.replace('/(auth)/login');
-      
-      // Don't setLoggingOut(false) here - component unmounts anyway
-    }
-  };
-
-  const renderItem = ({ item }: { item: Product }) => <ProductCard product={item} />;
+  const renderProduct = ({ item }: { item: Product }) => (
+    <ProductCard product={item} />
+  );
 
   const renderEmpty = () => (
-    <View style={styles.centered}>
-      <Text style={styles.emptyText}>No products available right now.</Text>
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyIcon}>
+        <ThemedText type="display" style={styles.emptyIconText}>
+          +
+        </ThemedText>
+      </View>
+      <ThemedText type="titleSmall" style={styles.emptyTitle}>
+        No products yet
+      </ThemedText>
+      <ThemedText
+        type="body"
+        themeColor="textSecondary"
+        style={styles.emptySubtitle}
+      >
+        Products will appear here once they are added.
+      </ThemedText>
+    </View>
+  );
+
+  const renderError = () => (
+    <View style={styles.emptyContainer}>
+      <View style={[styles.emptyIcon, styles.errorIcon]}>
+        <ThemedText type="display" style={[styles.emptyIconText, styles.errorIconText]}>
+          !
+        </ThemedText>
+      </View>
+      <ThemedText type="titleSmall" themeColor="error" style={styles.emptyTitle}>
+        Something went wrong
+      </ThemedText>
+      <ThemedText
+        type="body"
+        themeColor="textSecondary"
+        style={styles.emptySubtitle}
+      >
+        {error || 'Failed to load products'}
+      </ThemedText>
+      <ThemedButton
+        title="Try Again"
+        onPress={() => fetchProducts()}
+        variant="outline"
+        size="medium"
+        fullWidth={false}
+        style={styles.retryButton}
+      />
     </View>
   );
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={{ marginTop: 10, color: '#666' }}>Loading products...</Text>
+      <View style={styles.loadingContainer}>
+        <ThemedView type="card" style={[styles.loadingCard, Elevation.medium]}>
+          <ThemedText type="body" themeColor="textSecondary" style={styles.loadingText}>
+            Loading products...
+          </ThemedText>
+        </ThemedView>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* Header with Logout */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Available Products</Text>
-        <TouchableOpacity onPress={handleLogout} disabled={loggingOut} style={styles.logoutBtn}>
-          <Text style={styles.logoutText}>{loggingOut ? '...' : 'Logout'}</Text>
-        </TouchableOpacity>
+      {/* Header */}
+      <ThemedView type="backgroundElement" style={[styles.header, Elevation.low]}>
+        <View style={styles.headerContent}>
+          <View>
+            <ThemedText type="overline" themeColor="primary" style={styles.headerGreeting}>
+              {getGreeting()} {user?.name?.split(' ')[0] ?? ''}
+            </ThemedText>
+            <ThemedText type="headline" style={styles.headerTitle}>
+              Products
+            </ThemedText>
+          </View>
+          <ThemedButton
+            title="Sign Out"
+            onPress={logout}
+            variant="ghost"
+            size="small"
+            fullWidth={false}
+          />
+        </View>
+      </ThemedView>
+
+      {/* Product count bar */}
+      <View style={styles.countBar}>
+        <ThemedText type="labelSmall" themeColor="textTertiary" style={styles.countText}>
+          {products.length} {products.length === 1 ? 'PRODUCT' : 'PRODUCTS'}
+        </ThemedText>
       </View>
 
       {/* Product List */}
       <FlatList
         data={products}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
+        renderItem={renderProduct}
+        contentContainerStyle={[
+          styles.listContainer,
+          products.length === 0 && styles.emptyList,
+        ]}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={renderEmpty}
+        ListEmptyComponent={error ? renderError : renderEmpty}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#007AFF" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#2563EB"
+            colors={['#2563EB']}
+          />
         }
       />
     </View>
   );
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning,';
+  if (hour < 18) return 'Good afternoon,';
+  return 'Good evening,';
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FC',
   },
   header: {
+    paddingTop: Platform.OS === 'ios' ? 60 : 48,
+    paddingBottom: Spacing.five,
+    paddingHorizontal: Spacing.six,
+    borderBottomLeftRadius: Radius.xl,
+    borderBottomRightRadius: Radius.xl,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingTop: 50,
+    alignItems: 'flex-end',
+  },
+  headerGreeting: {
+    letterSpacing: 1.5,
+    marginBottom: Spacing.one,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
+    letterSpacing: -0.3,
   },
-  logoutBtn: {
-    backgroundColor: '#FF3B30',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  countBar: {
+    paddingHorizontal: Spacing.six,
+    paddingTop: Spacing.four,
+    paddingBottom: Spacing.two,
   },
-  logoutText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
+  countText: {
+    letterSpacing: 2,
   },
   listContainer: {
-    padding: 16,
+    paddingHorizontal: Spacing.six,
+    paddingBottom: Spacing.twenty,
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    width: '100%',
   },
-  centered: {
+  emptyList: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.twenty,
+  },
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: Radius.xxl,
+    backgroundColor: '#EEF0F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.six,
+  },
+  emptyIconText: {
+    color: '#9CA3AF',
+    fontSize: 36,
+    fontWeight: '300',
+  },
+  errorIcon: {
+    backgroundColor: '#FEE2E2',
+  },
+  errorIconText: {
+    color: '#DC2626',
+    fontWeight: '700',
+  },
+  emptyTitle: {
+    marginBottom: Spacing.two,
+  },
+  emptySubtitle: {
+    textAlign: 'center',
+    maxWidth: 280,
+  },
+  retryButton: {
+    marginTop: Spacing.five,
+    paddingHorizontal: Spacing.six,
+  },
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F8F9FC',
   },
-  emptyText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
+  loadingCard: {
+    paddingHorizontal: Spacing.eight,
+    paddingVertical: Spacing.five,
+    borderRadius: Radius.xl,
+  },
+  loadingText: {
+    letterSpacing: 0.5,
   },
 });

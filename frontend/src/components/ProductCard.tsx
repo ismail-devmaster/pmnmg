@@ -1,59 +1,142 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { Product } from '../types';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Product } from '@/types';
+import { ThemedView, ThemedText } from '@/components';
+import { Elevation, Radius, Spacing } from '@/constants/theme';
 
 interface ProductCardProps {
   product: Product;
+  onPress?: () => void;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+function formatPrice(price: number): string {
+  return price % 1 === 0 ? `$${price.toLocaleString()}` : `$${price.toFixed(2)}`;
+}
+
+export function ProductCard({ product, onPress }: ProductCardProps) {
   return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>${parseFloat(product.price as string).toFixed(2)}</Text>
-      </View>
-      {product.description ? (
-        <Text style={styles.description}>{product.description}</Text>
-      ) : null}
-    </View>
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      style={({ pressed }) => [
+        styles.wrapper,
+        Elevation.medium,
+        pressed && onPress && styles.pressed,
+      ]}
+    >
+      <ThemedView type="card" style={styles.card}>
+        {/* Accent top stripe */}
+        <View style={styles.accentStripe} />
+
+        <View style={styles.content}>
+          {/* Header row */}
+          <View style={styles.header}>
+            <View style={styles.titleContainer}>
+              <ThemedText
+                type="titleSmall"
+                style={styles.name}
+                numberOfLines={1}
+              >
+                {product.name}
+              </ThemedText>
+            </View>
+            <View style={styles.priceBadge}>
+              <ThemedText
+                type="bodyStrong"
+                style={styles.priceText}
+              >
+                {formatPrice(product.price)}
+              </ThemedText>
+            </View>
+          </View>
+
+          {/* Description */}
+          {product.description ? (
+            <ThemedText
+              type="body"
+              themeColor="textSecondary"
+              style={styles.description}
+              numberOfLines={2}
+            >
+              {product.description}
+            </ThemedText>
+          ) : null}
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <ThemedText
+              type="caption"
+              themeColor="textTertiary"
+              style={styles.id}
+            >
+              #{String(product.id).padStart(4, '0')}
+            </ThemedText>
+          </View>
+        </View>
+      </ThemedView>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    borderRadius: Radius.lg,
+    marginBottom: Spacing.four,
+    backgroundColor: 'transparent',
+  },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    // iOS Shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    // Android Shadow
-    elevation: 3,
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+  },
+  accentStripe: {
+    height: 3,
+    backgroundColor: '#2563EB',
+  },
+  content: {
+    padding: Spacing.five,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: Spacing.three,
+  },
+  titleContainer: {
+    flex: 1,
+    marginRight: Spacing.four,
   },
   name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    marginRight: 10,
+    letterSpacing: -0.2,
   },
-  price: {
-    fontSize: 18,
+  priceBadge: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one,
+    borderRadius: Radius.sm,
+  },
+  priceText: {
+    color: '#059669',
     fontWeight: '700',
-    color: '#34C759', // Green for price
+    letterSpacing: 0,
   },
   description: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    lineHeight: 22,
+    marginBottom: Spacing.four,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#F0F1F5',
+    paddingTop: Spacing.three,
+  },
+  id: {
+    fontWeight: '600',
+    letterSpacing: 1,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.985 }],
   },
 });

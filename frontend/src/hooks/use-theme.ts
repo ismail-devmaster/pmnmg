@@ -1,6 +1,6 @@
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Theme hook - provides semantic color access
+ * Works with the Colors object from @/constants/theme
  */
 
 import { Colors } from '@/constants/theme';
