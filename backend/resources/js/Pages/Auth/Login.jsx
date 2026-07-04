@@ -2,11 +2,11 @@ import InputError from '@/Components/InputError';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Mail, Lock, LogIn, ArrowRight, Shield } from 'lucide-react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
-        remember: false,
+  
     });
 
     const submit = (e) => {
@@ -121,28 +121,6 @@ export default function Login({ status, canResetPassword }) {
                                 />
                             </div>
                             <InputError message={errors.password} className="mt-2" />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name="remember"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="w-4 h-4 rounded border-obsidian-600 bg-obsidian-800 text-electric-500 focus:ring-electric-500/30 focus:ring-offset-0"
-                                />
-                                <span className="text-sm text-obsidian-400">Remember me</span>
-                            </label>
-
-                            {canResetPassword && (
-                                <Link
-                                    href={route('password.request')}
-                                    className="text-sm text-electric-400 hover:text-electric-300 transition-colors"
-                                >
-                                    Forgot password?
-                                </Link>
-                            )}
                         </div>
 
                         <button

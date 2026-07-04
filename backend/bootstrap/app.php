@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin' => IsAdmin::class,
             'adminOnly' => \App\Http\Middleware\AdminOnly::class,
         ]);
+$middleware->api(prepend: [
+    \Illuminate\Http\Middleware\HandleCors::class,
+]);
 
         RedirectIfAuthenticated::redirectUsing(function (Request $request) {
             if ($request->user()->isAdmin()) {
