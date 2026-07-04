@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -9,6 +10,7 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedInput, ThemedButton } from '@/components';
+import { ENV } from '@/config/env';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/use-theme';
 import {
@@ -52,6 +54,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
+    Alert.alert('API Address', ENV.API_URL);
     await login({ email, password });
   };
 
