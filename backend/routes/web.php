@@ -17,7 +17,7 @@ Route::get('/', function () {
         : redirect()->route('dashboard');
 });
 
-Route::middleware(['auth', 'verified', \App\Http\Middleware\AdminOnly::class])
+Route::middleware(['auth', \App\Http\Middleware\AdminOnly::class])
     ->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductController::class)->except(['show']);
