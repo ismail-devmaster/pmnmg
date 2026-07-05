@@ -7,172 +7,53 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useTheme } from '@/hooks/use-theme';
-import { Elevation, PremiumPalette, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'danger' | 'ghost' | 'outline' | 'premium';
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
+type Size = 'small' | 'medium' | 'large';
 
 export interface ThemedButtonProps extends Omit<TouchableOpacityProps, 'style' | 'onPress'> {
   title: string;
   onPress: () => void;
-  variant?: ButtonVariant;
-  size?: 'small' | 'medium' | 'large';
+  variant?: Variant;
+  size?: Size;
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
   style?: ViewStyle;
-  leftIcon?: React.ReactNode;
 }
 
-const VARIANT_CONFIG = {
-  primary: {
-    light: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
-    dark: { bg: '#4f46e5', text: '#FFFFFF', border: '#4f46e5' },
-  },
-  secondary: {
-    light: { bg: '#818cf8', text: '#FFFFFF', border: '#818cf8' },
-    dark: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
-  },
-  accent: {
-    light: { bg: '#fbbf24', text: '#0a0a1a', border: '#fbbf24' },
-    dark: { bg: '#f59e0b', text: '#0a0a1a', border: '#f59e0b' },
-  },
-  danger: {
-    light: { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.25)' },
-    dark: { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.25)' },
-  },
-  ghost: {
-    light: { bg: 'transparent', text: '#a8a8c0', border: 'transparent' },
-    dark: { bg: 'transparent', text: '#a8a8c0', border: 'transparent' },
-  },
-  outline: {
-    light: { bg: 'transparent', text: '#818cf8', border: 'rgba(99, 102, 241, 0.3)' },
-    dark: { bg: 'transparent', text: '#818cf8', border: 'rgba(99, 102, 241, 0.3)' },
-  },
-  premium: {
-    light: { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' },
-    dark: { bg: '#4f46e5', text: '#FFFFFF', border: '#4f46e5' },
-  },
-} as const;
-
-const VARIANT_SHADOW = {
-  primary: {
-    light: {
-      shadowColor: '#6366f1',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    dark: {
-      shadowColor: '#4f46e5',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.35,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-  },
-  secondary: {
-    light: {
-      shadowColor: '#818cf8',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 6,
-      elevation: 3,
-    },
-    dark: {
-      shadowColor: '#6366f1',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 6,
-      elevation: 3,
-    },
-  },
-  premium: {
-    light: {
-      shadowColor: '#6366f1',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 10,
-      elevation: 5,
-    },
-    dark: {
-      shadowColor: '#4f46e5',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.35,
-      shadowRadius: 10,
-      elevation: 5,
-    },
-  },
-} as const;
-
-const SIZE_CONFIG = {
-  small: {
-    paddingV: Spacing.three,
-    paddingH: Spacing.five,
-    fontSize: 13,
-    radius: Radius.sm,
-    minHeight: 36,
-  },
-  medium: {
-    paddingV: Spacing.four,
-    paddingH: Spacing.six,
-    fontSize: 15,
-    radius: Radius.md,
-    minHeight: 48,
-  },
-  large: {
-    paddingV: Spacing.five + Spacing.one,
-    paddingH: Spacing.eight,
-    fontSize: 16,
-    radius: Radius.lg,
-    minHeight: 56,
-  },
-} as const;
+const SIZE_MAP: Record<Size, { py: number; px: number; fs: number; radius: number; minH: number }> = {
+  small: { py: Spacing.three, px: Spacing.five, fs: 13, radius: Radius.sm, minH: 36 },
+  medium: { py: Spacing.four, px: Spacing.six, fs: 15, radius: Radius.md, minH: 48 },
+  large: { py: Spacing.five + Spacing.one, px: Spacing.eight, fs: 16, radius: Radius.lg, minH: 56 },
+};
 
 export function ThemedButton({
-  title,
-  onPress,
-  variant = 'primary',
-  size = 'medium',
-  disabled = false,
-  loading = false,
-  fullWidth = true,
-  style,
-  leftIcon,
-  ...props
+  title, onPress, variant = 'primary', size = 'medium',
+  disabled = false, loading = false, fullWidth = true, style, ...props
 }: ThemedButtonProps) {
   const theme = useTheme();
-  const isDark = theme.text === '#f0f0f5';
   const isDisabled = disabled || loading;
+  const s = SIZE_MAP[size];
 
-  const colors = VARIANT_CONFIG[variant][isDark ? 'dark' : 'light'];
-  const sizeConfig = SIZE_CONFIG[size];
-
-  const getOpacity = () => {
-    if (isDisabled) return 0.5;
-    return 1;
-  };
-
-  const shadowStyle = (VARIANT_SHADOW as Record<string, Record<string, ViewStyle>>)[variant]
-    ? (VARIANT_SHADOW as Record<string, Record<string, ViewStyle>>)[variant][isDark ? 'dark' : 'light']
-    : Elevation.none;
+  const colors = getVariantColors(variant, theme);
 
   return (
     <TouchableOpacity
       style={[
-        styles.button,
+        styles.base,
         {
           backgroundColor: colors.bg,
           borderColor: colors.border,
-          paddingVertical: sizeConfig.paddingV,
-          paddingHorizontal: sizeConfig.paddingH,
-          borderRadius: sizeConfig.radius,
-          minHeight: sizeConfig.minHeight,
-          opacity: getOpacity(),
+          paddingVertical: s.py,
+          paddingHorizontal: s.px,
+          borderRadius: s.radius,
+          minHeight: s.minH,
+          opacity: isDisabled ? 0.5 : 1,
         },
-        shadowStyle,
         fullWidth && styles.fullWidth,
-        variant === 'ghost' && styles.ghost,
+        variant === 'ghost' && styles.noBorder,
         style,
       ]}
       onPress={isDisabled ? undefined : onPress}
@@ -183,44 +64,37 @@ export function ThemedButton({
       {loading ? (
         <ActivityIndicator color={colors.text} size="small" />
       ) : (
-        <>
-          {leftIcon && <>{leftIcon}</>}
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color: colors.text,
-                fontSize: sizeConfig.fontSize,
-              },
-              leftIcon ? styles.buttonTextWithIcon : undefined,
-            ]}
-          >
-            {title}
-          </Text>
-        </>
+        <Text style={[styles.text, { color: colors.text, fontSize: s.fs }]}>
+          {title}
+        </Text>
       )}
     </TouchableOpacity>
   );
 }
 
+function getVariantColors(variant: Variant, theme: Record<string, string>) {
+  switch (variant) {
+    case 'primary':
+      return { bg: '#6366f1', text: '#FFFFFF', border: '#6366f1' };
+    case 'secondary':
+      return { bg: '#818cf8', text: '#FFFFFF', border: '#818cf8' };
+    case 'danger':
+      return { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.25)' };
+    case 'ghost':
+      return { bg: 'transparent', text: theme.textSecondary, border: 'transparent' };
+    case 'outline':
+      return { bg: 'transparent', text: '#818cf8', border: 'rgba(99, 102, 241, 0.3)' };
+  }
+}
+
 const styles = StyleSheet.create({
-  button: {
+  base: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
   },
-  fullWidth: {
-    width: '100%',
-  },
-  ghost: {
-    borderWidth: 0,
-  },
-  buttonText: {
-    fontWeight: '600',
-    letterSpacing: 0.2,
-  },
-  buttonTextWithIcon: {
-    marginLeft: Spacing.two,
-  },
+  fullWidth: { width: '100%' },
+  noBorder: { borderWidth: 0 },
+  text: { fontWeight: '600', letterSpacing: 0.2 },
 });

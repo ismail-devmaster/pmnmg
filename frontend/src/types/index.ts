@@ -23,26 +23,6 @@ export interface Product {
   updated_at: string;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  status: number;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
-
-export interface ApiError {
-  message: string;
-  errors?: Record<string, string[]>;
-  status: number;
-}
-
 export interface AuthResponse {
   token: string;
   user: User;
@@ -60,17 +40,3 @@ export interface RegisterData {
   password_confirmation: string;
 }
 
-export interface ProductFormData {
-  name: string;
-  description?: string;
-  price: number;
-}
-
-export type ProductListResponse = PaginatedResponse<Product> | Product[];
-
-export type UserRoleType = User['role'];
-
-export const USER_ROLES: readonly UserRole[] = ['client', 'admin'] as const;
-
-export const isAdmin = (role: UserRoleType): boolean => role === 'admin';
-export const isClient = (role: UserRoleType): boolean => role === 'client';

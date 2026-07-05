@@ -2,16 +2,7 @@ import { useState, useCallback } from 'react';
 import { Product } from '@/types';
 import api from '@/api/axios';
 
-interface UseProductsReturn {
-  products: Product[];
-  loading: boolean;
-  refreshing: boolean;
-  error: string | null;
-  fetchProducts: (showLoader?: boolean) => Promise<void>;
-  onRefresh: () => Promise<void>;
-}
-
-export function useProducts(): UseProductsReturn {
+export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -23,11 +14,11 @@ export function useProducts(): UseProductsReturn {
 
     try {
       const response = await api.get('/products');
-      const data = response.data.data ?? response.data;
-      setProducts(Array.isArray(data) ? data : []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load products';
-      setError(message);
+      const data = response.data;
+      // Handle both { data: [...] } and [...] shapes
+      setProducts(Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load products');
       if (__DEV__) console.error('Fetch products error:', err);
     } finally {
       if (showLoader) setLoading(false);
@@ -40,12 +31,5 @@ export function useProducts(): UseProductsReturn {
     await fetchProducts(false);
   }, [fetchProducts]);
 
-  return {
-    products,
-    loading,
-    refreshing,
-    error,
-    fetchProducts,
-    onRefresh,
-  };
+  return { products, loading, refreshing, error, fetchProducts, onRefresh };
 }

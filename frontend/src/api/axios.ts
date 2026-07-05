@@ -1,67 +1,87 @@
-import axios, { type AxiosError, type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
 import { storage } from '@/utils/storage';
 import { ENV } from '@/config/env';
 
-const api = axios.create({
-  baseURL: ENV.API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  timeout: 15000,
-});
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+const TIMEOUT_MS = 15000;
 
-const AUTH_TOKEN_HEADER = 'Authorization' as const;
-const BEARER_PREFIX = 'Bearer ' as const;
-
-api.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    const token = await storage.getToken();
-    if (token && config.headers) {
-      config.headers[AUTH_TOKEN_HEADER] = `${BEARER_PREFIX}${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => Promise.reject(error)
-);
-
-interface RetryConfig extends AxiosRequestConfig {
-  _retry?: boolean;
-  _retryCount?: number;
+export class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+    public readonly errors?: Record<string, string[]>
+  ) {
+    super(message);
+    this.name = 'HttpError';
+  }
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
+function isNetworkError(error: unknown): boolean {
+  if (error instanceof TypeError && error.message === 'Network request failed') return true;
+  if (error instanceof DOMException && error.name === 'AbortError') return true;
+  return false;
+}
 
-api.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError & { config?: RetryConfig }) => {
-    const { config, response } = error;
+async function request<T>(method: string, path: string, body?: unknown): Promise<{ data: T }> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
 
-    if (!config || config._retry) {
-      return Promise.reject(error);
+  const token = await storage.getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  const init: RequestInit = { method, headers, signal: controller.signal };
+  if (body !== undefined) init.body = JSON.stringify(body);
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(`${ENV.API_URL}${path}`, init);
+
+      if (response.status === 401) await storage.clearAuth();
+
+      if (!response.ok) {
+        let errorData: Record<string, unknown> = {};
+        try { errorData = await response.json(); } catch { /* ignore */ }
+        throw new HttpError(
+          response.status,
+          (errorData.message as string) ?? response.statusText,
+          errorData.errors as Record<string, string[]> | undefined
+        );
+      }
+
+      const data: T = await response.json();
+      return { data };
+    } catch (error) {
+      if (error instanceof HttpError) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (isNetworkError(lastError) && attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
+        continue;
+      }
+
+      clearTimeout(timeoutId);
+      throw lastError;
     }
-
-    const shouldRetry =
-      !response &&
-      (error.code === 'ECONNABORTED' ||
-        error.code === 'ERR_NETWORK' ||
-        error.message.includes('Network Error'));
-
-    if (shouldRetry && (config._retryCount ?? 0) < MAX_RETRIES) {
-      config._retry = true;
-      config._retryCount = (config._retryCount ?? 0) + 1;
-
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY * config._retryCount!));
-      return api(config);
-    }
-
-    if (response?.status === 401) {
-      await storage.clearAuth();
-    }
-
-    return Promise.reject(error);
   }
-);
+
+  clearTimeout(timeoutId);
+  throw lastError ?? new Error('Request failed');
+}
+
+const api = {
+  get<T = any>(path: string) { return request<T>('GET', path); },
+  post<T = any>(path: string, body?: unknown) { return request<T>('POST', path, body); },
+};
 
 export default api;
