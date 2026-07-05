@@ -1,8 +1,3 @@
-/**
- * Core domain types for the Product Management System
- * Strict TypeScript definitions with proper validation
- */
-
 export type UserRole = 'client' | 'admin';
 
 export interface User {
@@ -39,4 +34,3 @@ export interface RegisterData {
   password: string;
   password_confirmation: string;
 }
-

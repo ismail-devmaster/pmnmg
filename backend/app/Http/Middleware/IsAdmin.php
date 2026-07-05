@@ -10,8 +10,7 @@ class IsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if user is authenticated and has the 'admin' role
-        if ($request->user() && $request->user()->isAdmin()) {
+        if ($request->user()?->isAdmin()) {
             return $next($request);
         }
 

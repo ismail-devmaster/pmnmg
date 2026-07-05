@@ -14,29 +14,21 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Register a new user as a client.
-     */
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password, // Model 'hashed' cast auto-hashes this
+            'password' => $request->password,
             'role' => 'client',
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
-            'token' => $token,
+            'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => new UserResource($user),
         ], 201);
     }
 
-    /**
-     * Log in an existing user and issue an API token.
-     */
     public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
@@ -47,23 +39,18 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
-            'token' => $token,
+            'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => new UserResource($user),
-        ], 200);
+        ]);
     }
 
-    /**
-     * Log out the authenticated user by revoking the current access token.
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Logged out successfully',
-        ], 200);
+        ]);
     }
 }

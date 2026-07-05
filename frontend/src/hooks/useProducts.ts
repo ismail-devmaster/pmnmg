@@ -15,11 +15,9 @@ export function useProducts() {
     try {
       const response = await api.get('/products');
       const data = response.data;
-      // Handle both { data: [...] } and [...] shapes
       setProducts(Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load products');
-      if (__DEV__) console.error('Fetch products error:', err);
     } finally {
       if (showLoader) setLoading(false);
       setRefreshing(false);

@@ -15,10 +15,6 @@ export const storage = {
     return AsyncStorage.getItem(KEYS.TOKEN);
   },
 
-  async removeToken(): Promise<void> {
-    await AsyncStorage.removeItem(KEYS.TOKEN);
-  },
-
   async saveUser(user: User): Promise<void> {
     await AsyncStorage.setItem(KEYS.USER, JSON.stringify(user));
   },
@@ -29,7 +25,7 @@ export const storage = {
   },
 
   async clearAuth(): Promise<void> {
-    await Promise.all([this.removeToken(), AsyncStorage.removeItem(KEYS.USER)]);
+    await AsyncStorage.multiRemove([KEYS.TOKEN, KEYS.USER]);
   },
 };
 

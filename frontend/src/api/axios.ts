@@ -2,7 +2,6 @@ import { storage } from '@/utils/storage';
 import { ENV } from '@/config/env';
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
 const TIMEOUT_MS = 15000;
 
 export class HttpError extends Error {
@@ -14,12 +13,6 @@ export class HttpError extends Error {
     super(message);
     this.name = 'HttpError';
   }
-}
-
-function isNetworkError(error: unknown): boolean {
-  if (error instanceof TypeError && error.message === 'Network request failed') return true;
-  if (error instanceof DOMException && error.name === 'AbortError') return true;
-  return false;
 }
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<{ data: T }> {
@@ -47,7 +40,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
       if (!response.ok) {
         let errorData: Record<string, unknown> = {};
-        try { errorData = await response.json(); } catch { /* ignore */ }
+        try { errorData = await response.json(); } catch { /* empty */ }
         throw new HttpError(
           response.status,
           (errorData.message as string) ?? response.statusText,
@@ -65,8 +58,9 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
       lastError = error instanceof Error ? error : new Error(String(error));
 
-      if (isNetworkError(lastError) && attempt < MAX_RETRIES) {
-        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)));
+      const isRetryable = error instanceof TypeError || error instanceof DOMException;
+      if (isRetryable && attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
         continue;
       }
 

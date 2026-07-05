@@ -20,12 +20,22 @@ export default function ProductListScreen() {
   );
 
   if (loading) {
-    return <LoadingState theme={theme} />;
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <View style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+          <View style={styles.dotRow}>
+            {[1, 0.6, 0.3].map((opacity, i) => (
+              <View key={i} style={[styles.dot, { opacity }]} />
+            ))}
+          </View>
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading products...</Text>
+        </View>
+      </View>
+    );
   }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.background, borderBottomColor: theme.border }]}>
         <View style={styles.headerRow}>
           <View>
@@ -38,14 +48,12 @@ export default function ProductListScreen() {
         </View>
       </View>
 
-      {/* Product count */}
       <View style={styles.countBar}>
         <Text style={[styles.countText, { color: theme.textTertiary }]}>
           {products.length} {products.length === 1 ? 'PRODUCT' : 'PRODUCTS'}
         </Text>
       </View>
 
-      {/* Search */}
       <View style={styles.searchContainer}>
         <ThemedInput
           placeholder="Search products..."
@@ -56,38 +64,23 @@ export default function ProductListScreen() {
         />
       </View>
 
-      {/* List */}
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <ProductCard product={item} />}
-        contentContainerStyle={[
-          styles.list,
-          filtered.length === 0 && styles.listEmpty,
-        ]}
+        contentContainerStyle={[styles.list, filtered.length === 0 && styles.listEmpty]}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={error ? <ErrorState error={error} onRetry={() => fetchProducts()} theme={theme} /> : <EmptyState search={search} theme={theme} />}
+        ListEmptyComponent={
+          error ? (
+            <ErrorState error={error} onRetry={() => fetchProducts()} theme={theme} />
+          ) : (
+            <EmptyState search={search} theme={theme} />
+          )
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" colors={['#6366f1']} />
         }
       />
-    </View>
-  );
-}
-
-/* ── Sub-components ─────────────────────────────────── */
-
-function LoadingState({ theme }: { theme: Record<string, string> }) {
-  return (
-    <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
-      <View style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
-        <View style={styles.dotRow}>
-          {[1, 0.6, 0.3].map((opacity, i) => (
-            <View key={i} style={[styles.dot, { opacity }]} />
-          ))}
-        </View>
-        <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading products...</Text>
-      </View>
     </View>
   );
 }
@@ -126,11 +119,8 @@ function greeting(): string {
   return 'Good evening,';
 }
 
-/* ── Styles ──────────────────────────────────────────── */
-
 const styles = StyleSheet.create({
   container: { flex: 1 },
-
   header: {
     paddingTop: Platform.OS === 'ios' ? 60 : 48, paddingBottom: Spacing.five,
     paddingHorizontal: Spacing.six, borderBottomWidth: 1,
@@ -138,24 +128,19 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   greeting: { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: Spacing.one },
   headerTitle: { fontSize: 20, fontWeight: '700', letterSpacing: -0.3 },
-
   countBar: { paddingHorizontal: Spacing.six, paddingTop: Spacing.four, paddingBottom: Spacing.one },
   countText: { fontSize: 11, fontWeight: '700', letterSpacing: 2.5, textTransform: 'uppercase' },
-
   searchContainer: { paddingHorizontal: Spacing.six, paddingBottom: Spacing.two },
   searchInput: { marginBottom: 0 },
   searchIcon: { fontSize: 14 },
-
   list: { paddingHorizontal: Spacing.six, paddingBottom: Spacing.twenty, maxWidth: MaxContentWidth, alignSelf: 'center', width: '100%' },
   listEmpty: { flex: 1, justifyContent: 'center' },
-
   emptyContainer: { alignItems: 'center', paddingVertical: Spacing.twenty },
   emptyIcon: { width: 88, height: 88, borderRadius: Radius.full, borderWidth: 1.5, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.six },
   emptyIconText: { fontSize: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '600', marginBottom: Spacing.two },
   emptySubtitle: { fontSize: 14, textAlign: 'center', maxWidth: 280, lineHeight: 20 },
   retryBtn: { marginTop: Spacing.five, paddingHorizontal: Spacing.six },
-
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingCard: { paddingHorizontal: Spacing.eight, paddingVertical: Spacing.six, borderRadius: Radius.xl, borderWidth: 1, alignItems: 'center' },
   dotRow: { flexDirection: 'row', gap: Spacing.two, marginBottom: Spacing.three },

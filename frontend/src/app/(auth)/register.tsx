@@ -62,36 +62,20 @@ export default function RegisterScreen() {
               <Text style={[styles.formTitle, { color: theme.text }]}>Create Account</Text>
               <Text style={[styles.formSubtitle, { color: theme.textSecondary }]}>Join as a client</Text>
             </View>
-
             <View style={styles.formBody}>
-              <ThemedInput
-                label="Name" placeholder="John Doe"
-                value={name} onChangeText={(t) => { setName(t); clearError('name'); }}
-                error={errors.name} textContentType="name" autoComplete="name"
-              />
-
-              <ThemedInput
-                label="Email" placeholder="you@example.com"
-                value={email} onChangeText={(t) => { setEmail(t); clearError('email'); }}
-                error={errors.email} autoCapitalize="none" keyboardType="email-address"
-                textContentType="emailAddress" autoComplete="email"
-              />
-
-              <ThemedInput
-                label="Password" placeholder="Min. 8 characters"
-                value={password} onChangeText={(t) => { setPassword(t); clearError('password'); }}
-                error={errors.password} secureTextEntry
-                textContentType="newPassword" autoComplete="new-password"
-                hint="Must include uppercase, lowercase, and a number"
-              />
-
-              <ThemedInput
-                label="Confirm Password" placeholder="Re-enter your password"
-                value={confirmPassword} onChangeText={(t) => { setConfirmPassword(t); clearError('confirmPassword'); }}
-                error={errors.confirmPassword} secureTextEntry
-                textContentType="newPassword" autoComplete="new-password"
-              />
-
+              <ThemedInput label="Name" placeholder="John Doe" value={name}
+                onChangeText={(t) => { setName(t); clearError('name'); }} error={errors.name}
+                textContentType="name" autoComplete="name" />
+              <ThemedInput label="Email" placeholder="you@example.com" value={email}
+                onChangeText={(t) => { setEmail(t); clearError('email'); }} error={errors.email}
+                autoCapitalize="none" keyboardType="email-address" textContentType="emailAddress" autoComplete="email" />
+              <ThemedInput label="Password" placeholder="Min. 8 characters" value={password}
+                onChangeText={(t) => { setPassword(t); clearError('password'); }} error={errors.password}
+                secureTextEntry textContentType="newPassword" autoComplete="new-password"
+                hint="Must include uppercase, lowercase, and a number" />
+              <ThemedInput label="Confirm Password" placeholder="Re-enter your password" value={confirmPassword}
+                onChangeText={(t) => { setConfirmPassword(t); clearError('confirmPassword'); }} error={errors.confirmPassword}
+                secureTextEntry textContentType="newPassword" autoComplete="new-password" />
               <ThemedButton title="Register" onPress={handleRegister} loading={loading} size="large" fullWidth />
             </View>
           </View>

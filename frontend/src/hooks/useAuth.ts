@@ -18,13 +18,12 @@ export function useAuth() {
 
       if (storedUser?.role === 'admin') {
         await storage.clearAuth();
-        setUser(null);
         return;
       }
 
-      setUser(storedUser);
-    } catch (error) {
-      if (__DEV__) console.error('Auth check failed:', error);
+      setUser(storedUser ?? null);
+    } catch {
+      // Token/user data invalid — proceed as unauthenticated
     } finally {
       setLoading(false);
     }
@@ -81,10 +80,7 @@ export function useAuth() {
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof HttpError) {
-    if (error.message) return error.message;
-    if (error.errors) return Object.values(error.errors).flat().join('\n');
-  }
+  if (error instanceof HttpError) return error.message || (error.errors ? Object.values(error.errors).flat().join('\n') : '');
   if (error instanceof Error) return error.message;
   return 'An unexpected error occurred';
 }

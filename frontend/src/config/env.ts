@@ -1,23 +1,8 @@
 import { Platform } from 'react-native';
 
-/**
- * Environment configuration
- * Centralizes all environment-specific values
- *
- * EXPO_PUBLIC_API_URL is set in .env or via the environment.
- * Fallback logic:
- *   - Android emulator -> http://10.0.2.2:8000/api
- *   - iOS simulator     -> http://localhost:8000/api
- *   - Physical device   -> http://<LAN_IP>:8000/api (set via .env)
- */
-
 function getDefaultApiUrl(): string {
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (envUrl) return envUrl;
-
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:8000/api';
-  }
+  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
+  if (Platform.OS === 'android') return 'http://10.0.2.2:8000/api';
   return 'http://localhost:8000/api';
 }
 

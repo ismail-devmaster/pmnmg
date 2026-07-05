@@ -37,23 +37,19 @@ export default function LoginScreen() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          {/* Brand */}
-          <View style={styles.brand}>
-            <View style={styles.brandIcon}>
-              <Text style={styles.brandIconText}>🛡️</Text>
+          <View style={styles.brandSection}>
+            <View style={styles.brand}>
+              <View style={styles.brandIcon}>
+                <Text style={styles.brandIconText}>🛡️</Text>
+              </View>
+              <Text style={[styles.brandName, { color: theme.text }]}>Product Manager</Text>
             </View>
-            <Text style={[styles.brandName, { color: theme.text }]}>Product Manager</Text>
-          </View>
-
-          {/* Welcome */}
-          <View style={styles.welcomeSection}>
             <Text style={[styles.welcomeTitle, { color: theme.text }]}>Welcome back</Text>
             <Text style={[styles.welcomeSubtitle, { color: theme.textSecondary }]}>
               Sign in to your client account
             </Text>
           </View>
 
-          {/* Form */}
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
             <View style={styles.formBody}>
               <ThemedInput
@@ -67,7 +63,6 @@ export default function LoginScreen() {
                 textContentType="emailAddress"
                 autoComplete="email"
               />
-
               <ThemedInput
                 label="Password"
                 placeholder="Enter your password"
@@ -78,22 +73,16 @@ export default function LoginScreen() {
                 textContentType="password"
                 autoComplete="current-password"
               />
-
               <ThemedButton title="Sign In" onPress={handleLogin} loading={loading} size="large" fullWidth />
             </View>
           </View>
 
-          {/* Footer */}
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.textTertiary }]}>Don't have an account? </Text>
             <Link href="/(auth)/register" asChild>
               <ThemedButton title="Register" onPress={() => {}} variant="ghost" size="small" fullWidth={false} />
             </Link>
           </View>
-
-          <Text style={[styles.disclaimer, { color: theme.textTertiary }]}>
-            Client portal — For authorized users only
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -109,6 +98,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 80 : 60,
     paddingBottom: Spacing.twenty,
   },
+  brandSection: { marginBottom: Spacing.eight },
   brand: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.ten, gap: Spacing.three },
   brandIcon: {
     width: 48, height: 48, borderRadius: Radius.xl, backgroundColor: '#6366f1',
@@ -117,12 +107,10 @@ const styles = StyleSheet.create({
   },
   brandIconText: { fontSize: 24 },
   brandName: { fontSize: 24, fontWeight: '700', letterSpacing: -0.3 },
-  welcomeSection: { marginBottom: Spacing.eight },
   welcomeTitle: { fontSize: 28, fontWeight: '700', letterSpacing: -0.3, marginBottom: Spacing.two },
   welcomeSubtitle: { fontSize: 16, lineHeight: 24 },
   card: { borderRadius: Radius.xl, borderWidth: 1, overflow: 'hidden' },
   formBody: { padding: Spacing.six },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: Spacing.six },
   footerText: { fontSize: 12 },
-  disclaimer: { textAlign: 'center', marginTop: Spacing.three, fontSize: 12 },
 });
