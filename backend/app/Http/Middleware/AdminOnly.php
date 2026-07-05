@@ -11,7 +11,9 @@ class AdminOnly
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->isAdmin()) {
-            abort(403, 'Unauthorized. Admin access required.');
+            return redirect('/')->with('flash', [
+                'success' => 'Your role has been updated. Welcome to your dashboard.',
+            ]);
         }
 
         return $next($request);
