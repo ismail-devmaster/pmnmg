@@ -1,11 +1,12 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Package, Users, Menu, X, ChevronDown, LogOut, Home, Shield } from 'lucide-react';
+import { LayoutDashboard, Package, Users, BadgeCheck, Menu, X, ChevronDown, LogOut, Home, Shield } from 'lucide-react';
 
 const navigation = [
     { name: 'Dashboard', href: route('admin.dashboard'), icon: LayoutDashboard },
     { name: 'Products', href: route('admin.products.index'), icon: Package },
     { name: 'Users', href: route('admin.users.index'), icon: Users },
+    { name: 'Email Verification', href: route('admin.users.unverified'), icon: BadgeCheck },
 ];
 
 export default function AdminLayout({ header, children }) {
@@ -151,6 +152,11 @@ export default function AdminLayout({ header, children }) {
                 {usePage().props.flash?.success && (
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
                         <div className="flash-success animate-slide-up">{usePage().props.flash.success}</div>
+                    </div>
+                )}
+                {usePage().props.flash?.error && (
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+                        <div className="flash-error animate-slide-up">{usePage().props.flash.error}</div>
                     </div>
                 )}
 

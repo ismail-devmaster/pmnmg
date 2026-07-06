@@ -33,4 +33,19 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
+
+    public function verifyEmail(Request $request, User $user): JsonResponse|UserResource
+    {
+        if ($user->email_verified_at !== null) {
+            $user->email_verified_at = null;
+            $user->save();
+
+            return new UserResource($user);
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        return new UserResource($user);
+    }
 }

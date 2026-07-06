@@ -184,6 +184,10 @@
         @apply bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 
                rounded-xl px-5 py-3 text-sm font-medium;
     }
+    .flash-error {
+        @apply bg-red-500/10 border border-red-500/20 text-red-400 
+               rounded-xl px-5 py-3 text-sm font-medium;
+    }
 
     /* Empty state */
     .empty-state {
