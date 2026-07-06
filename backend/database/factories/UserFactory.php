@@ -22,4 +22,8 @@ class UserFactory extends Factory
             'role' => 'client',
         ];
     }
+    public function unverified(): static
+{
+    return $this->state(fn () => ['email_verified_at' => null]);
+}
 }

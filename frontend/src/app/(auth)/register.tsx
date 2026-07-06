@@ -50,6 +50,8 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!validate()) return;
+    // On success, useAuth's register() shows a "check your email" alert
+    // and redirects to /(auth)/login — no manual navigation needed here.
     await register({ name: name.trim(), email: email.trim(), password, password_confirmation: password });
   };
 

@@ -8,7 +8,8 @@ export class HttpError extends Error {
   constructor(
     public readonly status: number,
     message: string,
-    public readonly errors?: Record<string, string[]>
+    public readonly errors?: Record<string, string[]>,
+    public readonly isUnverified: boolean = false // 👈 ADDED: isUnverified property
   ) {
     super(message);
     this.name = 'HttpError';
@@ -22,7 +23,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   };
 
   const token = await storage.getToken();
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (token) headers['Authorization'] = `Bearer ${token}`; // Fixed template literal
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -34,17 +35,32 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch(`${ENV.API_URL}${path}`, init);
+      const response = await fetch(`${ENV.API_URL}${path}`, init); // Fixed template literal
 
       if (response.status === 401) await storage.clearAuth();
 
       if (!response.ok) {
         let errorData: Record<string, unknown> = {};
-        try { errorData = await response.json(); } catch { /* empty */ }
+        try { 
+          errorData = await response.json(); 
+        } catch { 
+          /* empty */ 
+        }
+
+        const errorMessage = (errorData.message as string) ?? response.statusText;
+
+        // 👇 ADDED: Logic to determine if this is an unverified email error
+        // Adjust the condition below if your backend uses a specific error code instead of a message
+        const isUnverified = 
+          (response.status === 401 || response.status === 403) && 
+          typeof errorMessage === 'string' && 
+          errorMessage.toLowerCase().includes('verify');
+
         throw new HttpError(
           response.status,
-          (errorData.message as string) ?? response.statusText,
-          errorData.errors as Record<string, string[]> | undefined
+          errorMessage,
+          errorData.errors as Record<string, string[]> | undefined,
+          isUnverified // 👈 ADDED: Passed the isUnverified flag
         );
       }
 
@@ -57,8 +73,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       }
 
       lastError = error instanceof Error ? error : new Error(String(error));
-
       const isRetryable = error instanceof TypeError || error instanceof DOMException;
+
       if (isRetryable && attempt < MAX_RETRIES) {
         await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
         continue;

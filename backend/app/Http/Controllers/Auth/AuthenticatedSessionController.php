@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -33,7 +34,20 @@ class AuthenticatedSessionController extends Controller
             ? 'admin.dashboard'
             : 'dashboard';
 
-        return redirect()->intended(route($route, absolute: false));
+
+    $user = Auth::user();
+
+    if (! $user->hasVerifiedEmail()) {
+        Auth::logout();
+
+        throw ValidationException::withMessages([
+            'email' => 'Please verify your email address before logging in.',
+        ]);
+    }
+
+    $request->session()->regenerate();
+
+        return redirect()->intended(route($route, RouteServiceProvider::HOME, absolute: false));
     }
 
     /**

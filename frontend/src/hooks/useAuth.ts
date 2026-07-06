@@ -8,6 +8,7 @@ import { Alert } from 'react-native';
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -31,7 +32,7 @@ export function useAuth() {
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
     try {
-      const { data } = await api.post<AuthResponse>('/login', credentials);
+      const { data } = await api.post<AuthResponse>('/login', { ...credentials, is_mobile: true });
 
       if (data.user.role === 'admin') {
         await storage.clearAuth();
@@ -41,9 +42,19 @@ export function useAuth() {
 
       await Promise.all([storage.saveToken(data.token), storage.saveUser(data.user)]);
       setUser(data.user);
+      setPendingEmail(null);
       router.replace('/(app)');
       return true;
     } catch (error) {
+      if (error instanceof HttpError && (error as any).isUnverified) {
+        setPendingEmail(credentials.email);
+        Alert.alert(
+          'Email Not Verified',
+          'Please verify your email address before logging in. Check your inbox, or tap "Resend Verification Email" below.'
+        );
+        return false;
+      }
+
       Alert.alert('Login Failed', getErrorMessage(error));
       return false;
     }
@@ -52,7 +63,11 @@ export function useAuth() {
   const register = useCallback(async (data: RegisterData): Promise<boolean> => {
     try {
       await api.post('/register', data);
-      Alert.alert('Success', 'Account created! Please log in.');
+      setPendingEmail(data.email);
+      Alert.alert(
+        'Check Your Email',
+        'Account created! We sent a verification link to your email. Verify it, then come back and log in.'
+      );
       router.replace('/(auth)/login');
       return true;
     } catch (error) {
@@ -60,6 +75,23 @@ export function useAuth() {
       return false;
     }
   }, []);
+
+  const resendVerification = useCallback(async (email?: string): Promise<boolean> => {
+    const target = email ?? pendingEmail;
+    if (!target) {
+      Alert.alert('Error', 'No email address to resend to. Please log in again first.');
+      return false;
+    }
+
+    try {
+      const { data } = await api.post<{ message: string }>('/email/resend', { email: target });
+      Alert.alert('Email Sent', data.message ?? 'Verification email sent — check your inbox.');
+      return true;
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+      return false;
+    }
+  }, [pendingEmail]);
 
   const logout = useCallback(async () => {
     try {
@@ -76,7 +108,16 @@ export function useAuth() {
 
   useEffect(() => { checkAuth(); }, [checkAuth]);
 
-  return { user, loading, isAuthenticated: !!user, login, register, logout, checkAuth };
+  return {
+    user,
+    loading,
+    isAuthenticated: !!user,
+    pendingEmail,
+    login,
+    register,
+    resendVerification,
+    logout,
+  };
 }
 
 function getErrorMessage(error: unknown): string {

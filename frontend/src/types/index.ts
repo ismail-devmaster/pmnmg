@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  verified: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -21,6 +22,17 @@ export interface Product {
 export interface AuthResponse {
   token: string;
   user: User;
+}
+
+export interface RegisterResponse {
+  message: string;
+  user: User;
+}
+
+// Shape of Laravel's validation error JSON (422/403)
+export interface ApiErrorResponse {
+  message: string;
+  errors?: Record<string, string[]>;
 }
 
 export interface LoginCredentials {

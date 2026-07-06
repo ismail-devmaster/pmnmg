@@ -11,7 +11,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const { login, loading } = useAuth();
+  const { login, loading, pendingEmail, resendVerification } = useAuth();
   const theme = useTheme();
 
   const validate = (): boolean => {
@@ -31,6 +31,10 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (!validate()) return;
     await login({ email, password });
+  };
+
+  const handleResend = async () => {
+    await resendVerification();
   };
 
   return (
@@ -74,6 +78,22 @@ export default function LoginScreen() {
                 autoComplete="current-password"
               />
               <ThemedButton title="Sign In" onPress={handleLogin} loading={loading} size="large" fullWidth />
+
+              {pendingEmail && (
+                <View style={styles.verifyBanner}>
+                  <Text style={[styles.verifyText, { color: theme.textSecondary }]}>
+                    Your email isn't verified yet. Check your inbox for the link, or resend it below.
+                  </Text>
+                  <ThemedButton
+                    title="Resend Verification Email"
+                    onPress={handleResend}
+                    loading={loading}
+                    variant="ghost"
+                    size="small"
+                    fullWidth
+                  />
+                </View>
+              )}
             </View>
           </View>
 
@@ -111,6 +131,8 @@ const styles = StyleSheet.create({
   welcomeSubtitle: { fontSize: 16, lineHeight: 24 },
   card: { borderRadius: Radius.xl, borderWidth: 1, overflow: 'hidden' },
   formBody: { padding: Spacing.six },
+  verifyBanner: { marginTop: Spacing.four, gap: Spacing.two },
+  verifyText: { fontSize: 13, lineHeight: 18, textAlign: 'center' },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: Spacing.six },
   footerText: { fontSize: 12 },
 });
