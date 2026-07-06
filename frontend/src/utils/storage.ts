@@ -6,6 +6,8 @@ const KEYS = {
   USER: '@auth_user',
 } as const;
 
+const REMEMBER_ME_KEY = 'remember_me';
+
 export const storage = {
   async saveToken(token: string): Promise<void> {
     await AsyncStorage.setItem(KEYS.TOKEN, token);
@@ -26,6 +28,15 @@ export const storage = {
 
   async clearAuth(): Promise<void> {
     await AsyncStorage.multiRemove([KEYS.TOKEN, KEYS.USER]);
+  },
+
+  async saveRememberMe(value: boolean): Promise<void> {
+    await AsyncStorage.setItem(REMEMBER_ME_KEY, value ? 'true' : 'false');
+  },
+
+  async getRememberMe(): Promise<boolean> {
+    const value = await AsyncStorage.getItem(REMEMBER_ME_KEY);
+    return value === 'true';
   },
 };
 

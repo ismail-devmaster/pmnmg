@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Link } from 'expo-router';
 import { ThemedInput, ThemedButton } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +9,7 @@ import { Radius, Spacing } from '@/constants/theme';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { login, loading, pendingEmail, resendVerification } = useAuth();
@@ -30,7 +31,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!validate()) return;
-    await login({ email, password });
+    await login({ email, password }, rememberMe);
   };
 
   const handleResend = async () => {
@@ -77,6 +78,26 @@ export default function LoginScreen() {
                 textContentType="password"
                 autoComplete="current-password"
               />
+
+              <TouchableOpacity
+                style={styles.rememberRow}
+                onPress={() => setRememberMe((prev) => !prev)}
+                activeOpacity={0.7}
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    { borderColor: theme.cardBorder },
+                    rememberMe && { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+                  ]}
+                >
+                  {rememberMe && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={[styles.rememberText, { color: theme.textSecondary }]}>
+                  Stay signed in
+                </Text>
+              </TouchableOpacity>
+
               <ThemedButton title="Sign In" onPress={handleLogin} loading={loading} size="large" fullWidth />
 
               {pendingEmail && (
@@ -131,6 +152,13 @@ const styles = StyleSheet.create({
   welcomeSubtitle: { fontSize: 16, lineHeight: 24 },
   card: { borderRadius: Radius.xl, borderWidth: 1, overflow: 'hidden' },
   formBody: { padding: Spacing.six },
+  rememberRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginBottom: Spacing.four },
+  checkbox: {
+    width: 20, height: 20, borderRadius: 5, borderWidth: 1.5,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  checkmark: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  rememberText: { fontSize: 14 },
   verifyBanner: { marginTop: Spacing.four, gap: Spacing.two },
   verifyText: { fontSize: 13, lineHeight: 18, textAlign: 'center' },
   footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: Spacing.six },
