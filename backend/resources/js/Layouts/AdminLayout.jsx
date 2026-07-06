@@ -1,12 +1,11 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { LayoutDashboard, Package, Users, BadgeCheck, Menu, X, ChevronDown, LogOut, Home, Shield } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Menu, X, ChevronDown, LogOut, Home, Shield } from 'lucide-react';
 
 const navigation = [
     { name: 'Dashboard', href: route('admin.dashboard'), icon: LayoutDashboard },
     { name: 'Products', href: route('admin.products.index'), icon: Package },
     { name: 'Users', href: route('admin.users.index'), icon: Users },
-    { name: 'Email Verification', href: route('admin.users.unverified'), icon: BadgeCheck },
 ];
 
 export default function AdminLayout({ header, children }) {

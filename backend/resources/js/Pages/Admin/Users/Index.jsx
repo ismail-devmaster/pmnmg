@@ -1,11 +1,12 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, router } from '@inertiajs/react';
-import { Users, Shield, User, Search, Check, X, ArrowUpDown } from 'lucide-react';
+import { Users, Shield, User, Search, BadgeCheck, XCircle, ArrowUpDown } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Index({ users }) {
     const [search, setSearch] = useState('');
     const [changingUserId, setChangingUserId] = useState(null);
+    const [togglingId, setTogglingId] = useState(null);
 
     const filteredUsers = users.data.filter((u) =>
         u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -29,6 +30,19 @@ export default function Index({ users }) {
         if (window.confirm(`Change ${user.name}'s role from ${currentRole} to ${targetRole}?`)) {
             handleRoleChange(user, newRole);
         }
+    };
+
+    const handleVerifyToggle = (user) => {
+        const action = user.verified ? 'unverify' : 'verify';
+        const label = user.verified ? 'mark as unverified' : 'verify';
+        if (!window.confirm(`Are you sure you want to ${label} ${user.name}'s email (${user.email})?`)) return;
+
+        setTogglingId(user.id);
+        router.put(route('admin.users.verify', user.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => setTogglingId(null),
+            onError: () => setTogglingId(null),
+        });
     };
 
     return (
@@ -64,6 +78,7 @@ export default function Index({ users }) {
                                     <th>User</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Status</th>
                                     <th>Joined</th>
                                     <th className="text-right">Actions</th>
                                 </tr>
@@ -73,8 +88,14 @@ export default function Index({ users }) {
                                     <tr key={user.id} className={`opacity-0 animate-slide-up stagger-${Math.min(index + 1, 5)} group`}>
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-electric-500/20 to-electric-600/20 border border-electric-500/15 flex items-center justify-center group-hover:border-electric-500/30 transition-all duration-200">
-                                                    <span className="text-sm font-bold text-electric-400">
+                                                <div className={`h-10 w-10 rounded-xl bg-gradient-to-br border flex items-center justify-center group-hover:border-electric-500/30 transition-all duration-200 ${
+                                                    user.verified
+                                                        ? 'from-emerald-500/20 to-emerald-600/20 border-emerald-500/15'
+                                                        : 'from-amber-500/20 to-amber-600/20 border-amber-500/15'
+                                                }`}>
+                                                    <span className={`text-sm font-bold ${
+                                                        user.verified ? 'text-emerald-400' : 'text-amber-400'
+                                                    }`}>
                                                         {user.name.charAt(0).toUpperCase()}
                                                     </span>
                                                 </div>
@@ -95,10 +116,23 @@ export default function Index({ users }) {
                                                 </span>
                                             )}
                                         </td>
+                                        <td>
+                                            {user.verified ? (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                    <BadgeCheck className="h-3.5 w-3.5" />
+                                                    Verified
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                    <XCircle className="h-3.5 w-3.5" />
+                                                    Unverified
+                                                </span>
+                                            )}
+                                        </td>
                                         <td className="text-obsidian-400">{user.created_at}</td>
                                         <td className="text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                {changingUserId === user.id ? (
+                                                {togglingId === user.id || changingUserId === user.id ? (
                                                     <span className="inline-flex items-center gap-2 px-3 py-1.5 text-xs text-obsidian-400">
                                                         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
                                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -106,22 +140,43 @@ export default function Index({ users }) {
                                                         </svg>
                                                         Updating...
                                                     </span>
-                                                ) : user.role === 'admin' ? (
-                                                    <button
-                                                        onClick={() => confirmRoleChange(user, 'client')}
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all duration-200"
-                                                    >
-                                                        <ArrowUpDown className="h-3 w-3" />
-                                                        Demote to Client
-                                                    </button>
                                                 ) : (
-                                                    <button
-                                                        onClick={() => confirmRoleChange(user, 'admin')}
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/30 transition-all duration-200"
-                                                    >
-                                                        <ArrowUpDown className="h-3 w-3" />
-                                                        Promote to Admin
-                                                    </button>
+                                                    <>
+                                                        {user.verified ? (
+                                                            <button
+                                                                onClick={() => handleVerifyToggle(user)}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/30 transition-all duration-200"
+                                                            >
+                                                                <XCircle className="h-3 w-3" />
+                                                                Unverify
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleVerifyToggle(user)}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all duration-200"
+                                                            >
+                                                                <BadgeCheck className="h-3 w-3" />
+                                                                Verify
+                                                            </button>
+                                                        )}
+                                                        {user.role === 'admin' ? (
+                                                            <button
+                                                                onClick={() => confirmRoleChange(user, 'client')}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all duration-200"
+                                                            >
+                                                                <ArrowUpDown className="h-3 w-3" />
+                                                                Demote
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => confirmRoleChange(user, 'admin')}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/30 transition-all duration-200"
+                                                            >
+                                                                <ArrowUpDown className="h-3 w-3" />
+                                                                Promote
+                                                            </button>
+                                                        )}
+                                                    </>
                                                 )}
                                             </div>
                                         </td>
@@ -129,7 +184,7 @@ export default function Index({ users }) {
                                 ))}
                                 {filteredUsers.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="empty-state">
+                                        <td colSpan="6" className="empty-state">
                                             <div className="flex flex-col items-center gap-3">
                                                 <div className="p-4 rounded-2xl bg-obsidian-800/50 border border-obsidian-600/20">
                                                     <Users className="h-8 w-8 text-obsidian-500" />

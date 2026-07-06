@@ -27,22 +27,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function unverified(): Response
-    {
-        $users = User::latest()->paginate(10)->through(fn ($user) => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role,
-            'verified' => $user->email_verified_at !== null,
-            'created_at' => $user->created_at->format('M d, Y'),
-        ]);
-
-        return Inertia::render('Admin/Users/EmailVerification', [
-            'users' => $users,
-        ]);
-    }
-
     public function verifyEmail(Request $request, User $user): RedirectResponse
     {
         if ($user->email_verified_at !== null) {

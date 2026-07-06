@@ -23,7 +23,6 @@ Route::middleware(['auth', \App\Http\Middleware\AdminOnly::class])
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductController::class)->except(['show']);
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/unverified', [UserController::class, 'unverified'])->name('users.unverified');
         Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role');
         Route::put('/users/{user}/verify', [UserController::class, 'verifyEmail'])->name('users.verify');
     });
