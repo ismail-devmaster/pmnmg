@@ -14,7 +14,7 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'is_active', 'profile_picture'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -35,6 +35,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_picture
+            ? asset('storage/' . $this->profile_picture)
+            : null;
     }
 
     public function sendEmailVerificationNotification(): void

@@ -20,8 +20,16 @@ Route::middleware(['auth', \App\Http\Middleware\AdminOnly::class])
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductController::class)->except(['show']);
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.role');
         Route::put('/users/{user}/verify', [UserController::class, 'verifyEmail'])->name('users.verify');
+        Route::put('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
+        Route::post('/users/{user}/upload-photo', [UserController::class, 'uploadPhoto'])->name('users.upload-photo');
+        Route::delete('/users/{user}/remove-photo', [UserController::class, 'removePhoto'])->name('users.remove-photo');
     });
 
 Route::middleware(['auth', \App\Http\Middleware\AdminOnly::class])->group(function () {
