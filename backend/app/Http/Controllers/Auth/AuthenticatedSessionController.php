@@ -38,11 +38,17 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
+    if (! $user->isAdmin()) {
+        Auth::logout();
+
+        throw ValidationException::withMessages([
+            'email' => 'Only administrators can access this portal.',
+        ]);
+    }
+
     $request->session()->regenerate();
 
-    $route = $user->isAdmin() ? 'admin.dashboard' : 'dashboard';
-
-    return redirect()->intended(route($route, absolute: false));
+    return redirect()->intended(route('admin.dashboard', absolute: false));
 }
     /**
      * Destroy an authenticated session.
