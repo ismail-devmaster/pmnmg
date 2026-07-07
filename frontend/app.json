@@ -7,7 +7,8 @@
     },
     "owner": "ismabeast",
     "android": {
-      "package": "com.ismabeast.frontend"
+      "package": "com.ismabeast.frontend",
+      "usesCleartextTraffic": true
     },
     "ios": {
       "bundleIdentifier": "com.ismabeast.frontend"
