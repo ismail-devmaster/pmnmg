@@ -13,6 +13,13 @@
         --color-text-secondary: #a8a8c0;
         --color-accent: #6366f1;
         --color-accent-glow: rgba(99, 102, 241, 0.15);
+
+        --fluid-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+        --fluid-base: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+        --fluid-lg: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+        --fluid-xl: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+        --fluid-2xl: clamp(1.5rem, 1.1rem + 1.5vw, 2rem);
+        --fluid-3xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
     }
 
     body {
@@ -33,6 +40,23 @@
     }
     ::-webkit-scrollbar-thumb:hover {
         @apply bg-electric-500;
+    }
+
+    /* Ensure minimum touch target size on mobile */
+    @media (pointer: coarse) {
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+    }
+
+    /* Safe area padding for notched devices */
+    .safe-area-padding {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    .safe-area-pb {
+        padding-bottom: env(safe-area-inset-bottom);
     }
 }
 
@@ -201,6 +225,60 @@
     .modal-content {
         @apply premium-card p-6 max-w-md w-full mx-4;
     }
+
+    /* Premium link */
+    .link-premium {
+        @apply text-obsidian-400 hover:text-electric-400 transition-colors duration-200 text-sm;
+    }
+
+    /* Premium select */
+    .select-premium {
+        @apply input-premium appearance-none cursor-pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a8a8c0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        padding-right: 2.5rem;
+    }
+
+    /* Premium checkbox */
+    .checkbox-premium {
+        @apply h-4 w-4 rounded-lg border-obsidian-600/40 bg-obsidian-900/60 
+               text-electric-500 focus:ring-2 focus:ring-electric-500/30 focus:ring-offset-0
+               transition-all duration-150 cursor-pointer;
+    }
+    .checkbox-premium:checked {
+        @apply border-electric-500;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+        @apply bg-obsidian-700/50 rounded-xl animate-pulse;
+    }
+
+    /* Responsive table card (mobile card layout for table rows) */
+    .table-card {
+        @apply flex flex-col gap-3 p-4 rounded-2xl border border-obsidian-600/15
+               bg-gradient-to-br from-obsidian-800/80 to-obsidian-900/60
+               transition-all duration-200;
+    }
+    .table-card:hover {
+        @apply border-electric-500/25;
+    }
+    .table-card-row {
+        @apply flex items-center justify-between gap-2;
+    }
+    .table-card-label {
+        @apply text-[11px] font-semibold text-obsidian-500 uppercase tracking-wider;
+    }
+    .table-card-value {
+        @apply text-sm text-obsidian-200 text-right;
+    }
+
+    /* Page transition wrapper */
+    .page-enter {
+        animation: page-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 }
 
 @layer utilities {
@@ -209,4 +287,98 @@
     .stagger-3 { animation-delay: 0.15s; }
     .stagger-4 { animation-delay: 0.2s; }
     .stagger-5 { animation-delay: 0.25s; }
+    .stagger-6 { animation-delay: 0.3s; }
+    .stagger-7 { animation-delay: 0.35s; }
+    .stagger-8 { animation-delay: 0.4s; }
+}
+
+/* ── Aurora background waves ── */
+@keyframes aurora-wave {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(30px, -20px) scale(1.05); }
+    50% { transform: translate(-20px, 10px) scale(0.95); }
+    75% { transform: translate(10px, -30px) scale(1.02); }
+}
+@keyframes aurora-wave-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(-25px, 15px) scale(1.03); }
+    50% { transform: translate(20px, -10px) scale(0.97); }
+    75% { transform: translate(-15px, 25px) scale(1.01); }
+}
+.animate-aurora { animation: aurora-wave 12s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-wave-2 16s ease-in-out infinite; }
+
+/* ── Orbit spin for stat rings ── */
+@keyframes orbit-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-orbit { animation: orbit-spin 8s linear infinite; }
+.animate-orbit-slow { animation: orbit-spin 14s linear infinite; }
+
+/* ── Floating particles ── */
+@keyframes float-drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+    50% { transform: translateY(-40px) rotate(180deg); opacity: 0.6; }
+}
+.animate-float { animation: float-drift 10s ease-in-out infinite; }
+.animate-float-2 { animation: float-drift 14s ease-in-out 2s infinite; }
+.animate-float-3 { animation: float-drift 18s ease-in-out 5s infinite; }
+
+/* ── Bar grow for activity chart ── */
+@keyframes bar-grow {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+.animate-bar { animation: bar-grow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ── Count-up with step reveal ── */
+@keyframes count-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Shimmer border pulse ── */
+@keyframes shimmer-pulse {
+    0%, 100% { border-color: rgba(99, 102, 241, 0.15); }
+    50% { border-color: rgba(99, 102, 241, 0.35); }
+}
+.animate-shimmer-border { animation: shimmer-pulse 3s ease-in-out infinite; }
+
+/* ── Stepped reveal for staggered entrances ── */
+@keyframes reveal-up {
+    from { opacity: 0; transform: translateY(30px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-reveal { animation: reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* ── Slow scale pulse ── */
+@keyframes scale-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+.animate-scale-pulse { animation: scale-pulse 4s ease-in-out infinite; }
+
+/* ── Glow rotate for stat card borders ── */
+@keyframes border-glow-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.animate-border-glow {
+    background-size: 200% 200%;
+    animation: border-glow-rotate 4s ease-in-out infinite;
+}
+
+/* ── Hide scrollbar for carousels ── */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Page enter transition ── */
+@keyframes page-enter {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }

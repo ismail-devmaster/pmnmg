@@ -7,14 +7,33 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $products = Product::latest()->paginate(10)->through(fn ($product) => [
+        $query = Product::query();
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $sortField = $request->get('sort', 'created_at');
+        $sortDir = $request->get('dir', 'desc');
+        $allowedSorts = ['name', 'price', 'created_at'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
+        }
+
+        $perPage = min((int) $request->get('per_page', 10), 50);
+
+        $products = $query->paginate($perPage)->through(fn ($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
@@ -24,6 +43,7 @@ class ProductController extends Controller
 
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
+            'filters' => $request->only(['search', 'sort', 'dir', 'per_page']),
         ]);
     }
 

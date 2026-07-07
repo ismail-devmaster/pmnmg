@@ -68,26 +68,26 @@ export default function Login({ status }) {
             </div>
 
             {/* Right panel - Login form */}
-            <div className="flex-1 flex items-center justify-center p-8">
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-8 min-w-0">
                 <div className="w-full max-w-md">
                     {/* Mobile brand */}
-                    <div className="lg:hidden flex items-center gap-3 mb-10">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-electric-500 to-electric-600 shadow-glow">
+                    <div className="lg:hidden flex items-center gap-3 mb-8 sm:mb-10">
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-electric-500 to-electric-600 shadow-glow flex-shrink-0">
                             <Shield className="h-5 w-5 text-white" />
                         </div>
                         <span className="text-xl font-bold text-white">Product Admin</span>
                     </div>
 
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-white mb-2">Welcome back</h2>
-                        <p className="text-obsidian-400">Sign in to your administrator account</p>
+                    <div className="mb-6 sm:mb-8">
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Welcome back</h2>
+                        <p className="text-sm sm:text-base text-obsidian-400">Sign in to your administrator account</p>
                     </div>
 
                     {status && (
-                        <div className="mb-6 flash-success">{status}</div>
+                        <div className="mb-4 sm:mb-6 flash-success">{status}</div>
                     )}
 
-                    <form onSubmit={submit} className="space-y-5">
+                    <form onSubmit={submit} className="space-y-4 sm:space-y-5">
                         <div>
                             <label className="label-premium">Email Address</label>
                             <div className="relative">
@@ -152,7 +152,7 @@ export default function Login({ status }) {
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-xs text-obsidian-500">
+                    <p className="mt-6 sm:mt-8 text-center text-xs text-obsidian-500">
                         Admin portal — Authorized personnel only
                     </p>
                 </div>

@@ -1,19 +1,14 @@
 import { Link } from '@inertiajs/react';
 
-export default function ResponsiveNavLink({
-    active = false,
-    className = '',
-    children,
-    ...props
-}) {
+export default function ResponsiveNavLink({ active = false, className = '', children, ...props }) {
     return (
         <Link
             {...props}
-            className={`flex w-full items-start border-l-4 py-2 pe-4 ps-3 ${
+            className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 active
-                    ? 'border-indigo-400 bg-indigo-50 text-indigo-700 focus:border-indigo-700 focus:bg-indigo-100 focus:text-indigo-800'
-                    : 'border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 focus:border-gray-300 focus:bg-gray-50 focus:text-gray-800'
-            } text-base font-medium transition duration-150 ease-in-out focus:outline-none ${className}`}
+                    ? 'bg-electric-600/15 text-electric-400 border border-electric-500/20'
+                    : 'text-obsidian-300 hover:bg-obsidian-700/40 hover:text-white border border-transparent'
+            } ${className}`}
         >
             {children}
         </Link>
